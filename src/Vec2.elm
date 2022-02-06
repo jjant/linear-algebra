@@ -8,6 +8,7 @@ module Vec2 exposing
     , distanceSquared
     , dot
     , down
+    , fromHomogeneous
     , left
     , lengthSquared
     , lerp
@@ -27,6 +28,8 @@ module Vec2 exposing
     , vec2
     , zero
     )
+
+import Vec3 exposing (Vec3)
 
 
 type alias Vec2 =
@@ -49,6 +52,8 @@ setY y { x } =
     }
 
 
+{-| Create a vector out of its x and y coordinates.
+-}
 vec2 : Float -> Float -> Vec2
 vec2 =
     Vec2
@@ -209,6 +214,9 @@ midpoint v1 v2 =
 
 
 {-| Linearly interpolate `from` to `to` with a [0, 1] parameter.
+
+    lerp { from = vec2 0 1, to = vec2 1 1 } 0.75 == vec2 0.75 1
+
 -}
 lerp : { from : Vec2, to : Vec2 } -> Float -> Vec2
 lerp { from, to } t =
@@ -222,7 +230,7 @@ angle { x, y } =
 
 
 
----- Commonly use vectors ----
+---- Commonly used vectors ----
 
 
 zero : Vec2
@@ -230,21 +238,40 @@ zero =
     vec2 0 0
 
 
+{-| Standard "up" vector, vec2 0 1.
+-}
 up : Vec2
 up =
     vec2 0 1
 
 
+{-| Standard "down" vector, vec2 0 -1.
+-}
 down : Vec2
 down =
     vec2 0 -1
 
 
+{-| Standard "right" vector, vec2 1 0.
+-}
 right : Vec2
 right =
     vec2 1 0
 
 
+{-| Standard "left" vector, vec2 -1 0.
+-}
 left : Vec2
 left =
     vec2 -1 0
+
+
+{-| Conversions
+-}
+fromHomogeneous : Vec3 -> Vec2
+fromHomogeneous v3 =
+    if v3.z /= 0 then
+        vec2 (v3.x / v3.z) (v3.y / v3.z)
+
+    else
+        vec2 v3.x v3.y
