@@ -16,7 +16,7 @@ jobs:
         run: npm install
       - name: Test
         run: ./node_modules/elm-test/bin/elm-test
-      - name: check documentation
-        run: |
-          elm make --docs=docs.json
-          rm docs.json
+      # - name: check documentation
+      #   run: |
+      #     elm make --docs=docs.json
+      #     rm docs.json
