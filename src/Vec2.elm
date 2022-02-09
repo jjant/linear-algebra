@@ -1,43 +1,65 @@
 module Vec2 exposing
-    ( Vec2
-    , add
-    , angle
+    ( Vec2, vec2
+    , setX, setY
+    , zero, up, down, left, right
+    , add, sub, negate, scale, dot, normalize, direction, midpoint
+    , lerp, angle
+    , scaleX, scaleY, rotateCCW
+    , length, lengthSquared, distance, distanceSquared
     , cross
-    , direction
-    , distance
-    , distanceSquared
-    , dot
-    , down
     , fromHomogeneous
-    , left
-    , lengthSquared
-    , lerp
-    , midpoint
-    , negate
-    , normalize
-    , right
-    , rotateCCW
-    , scale
-    , scaleX
-    , scaleY
-    , setX
-    , setY
-    , sub
     , toString
-    , up
-    , vec2
-    , zero
     )
+
+{-| 2D Vectors for math.
+
+
+# Create
+
+@docs Vec2, vec2
+
+
+# Setters
+
+@docs setX, setY
+
+
+# Constants
+
+@docs zero, up, down, left, right
+
+
+# Operations
+
+@docs add, sub, negate, scale, dot, normalize, direction, midpoint
+@docs lerp, angle
+@docs scaleX, scaleY, rotateCCW
+@docs length, lengthSquared, distance, distanceSquared
+@docs cross
+
+
+# Conversions
+
+@docs fromHomogeneous
+@docs toString
+
+-}
 
 import Vec3 exposing (Vec3)
 
 
+{-| -}
 type alias Vec2 =
     { x : Float
     , y : Float
     }
 
 
+
+---- Setters ----
+
+
+{-| -}
 setX : Float -> Vec2 -> Vec2
 setX x { y } =
     { x = x
@@ -45,6 +67,7 @@ setX x { y } =
     }
 
 
+{-| -}
 setY : Float -> Vec2 -> Vec2
 setY y { x } =
     { x = x
@@ -59,6 +82,7 @@ vec2 =
     Vec2
 
 
+{-| -}
 add : Vec2 -> Vec2 -> Vec2
 add v1 v2 =
     { x = v1.x + v2.x
@@ -82,6 +106,7 @@ sub v1 v2 =
     }
 
 
+{-| -}
 scale : Float -> Vec2 -> Vec2
 scale factor vec =
     { x = vec.x * factor
@@ -89,11 +114,13 @@ scale factor vec =
     }
 
 
+{-| -}
 distance : Vec2 -> Vec2 -> Float
 distance v1 v2 =
     length (sub v1 v2)
 
 
+{-| -}
 distanceSquared : Vec2 -> Vec2 -> Float
 distanceSquared v1 v2 =
     lengthSquared (sub v1 v2)
@@ -115,6 +142,7 @@ lengthSquared { x, y } =
     x ^ 2 + y ^ 2
 
 
+{-| -}
 dot : Vec2 -> Vec2 -> Float
 dot v1 v2 =
     v1.x * v2.x + v1.y * v2.y
@@ -184,6 +212,7 @@ toString { x, y } =
         ++ " }"
 
 
+{-| -}
 scaleX : Float -> Vec2 -> Vec2
 scaleX xScale { x, y } =
     { x = xScale * x
@@ -191,6 +220,7 @@ scaleX xScale { x, y } =
     }
 
 
+{-| -}
 scaleY : Float -> Vec2 -> Vec2
 scaleY yScale { x, y } =
     { x = x
@@ -224,6 +254,7 @@ lerp { from, to } t =
     add (scale (1 - t) from) (scale t to)
 
 
+{-| -}
 angle : Vec2 -> Float
 angle { x, y } =
     Basics.atan2 y x
@@ -233,6 +264,7 @@ angle { x, y } =
 ---- Commonly used vectors ----
 
 
+{-| -}
 zero : Vec2
 zero =
     vec2 0 0

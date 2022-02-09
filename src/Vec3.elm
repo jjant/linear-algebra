@@ -1,19 +1,33 @@
 module Vec3 exposing
-    ( Vec3
-    , add
-    , dot
-    , length
-    , lengthSquared
-    , negate
-    , normalize
-    , setX
-    , setY
-    , setZ
-    , vec3
-    , zero
+    ( Vec3, vec3, zero
+    , setX, setY, setZ
+    , add, sub, negate, scale, dot, cross, normalize, direction
+    , length, lengthSquared, distance, distanceSquared
     )
 
+{-| Vec3
 
+
+# Create
+
+@docs Vec3, vec3, zero
+
+
+# Setters
+
+@docs setX, setY, setZ
+
+
+# Operations
+
+@docs add, sub, negate, scale, dot, cross, normalize, direction
+@docs length, lengthSquared, distance, distanceSquared
+
+-}
+
+
+{-| Vec3
+-}
 type alias Vec3 =
     { x : Float
     , y : Float
@@ -21,6 +35,7 @@ type alias Vec3 =
     }
 
 
+{-| -}
 vec3 : Float -> Float -> Float -> Vec3
 vec3 =
     Vec3
@@ -30,6 +45,7 @@ vec3 =
 ---- Constants ----
 
 
+{-| -}
 zero : Vec3
 zero =
     vec3 0 0 0
@@ -39,16 +55,19 @@ zero =
 ---- Setters ----
 
 
+{-| -}
 setX : Float -> Vec3 -> Vec3
 setX x vec =
     { vec | x = x }
 
 
+{-| -}
 setY : Float -> Vec3 -> Vec3
 setY y vec =
     { vec | y = y }
 
 
+{-| -}
 setZ : Float -> Vec3 -> Vec3
 setZ z vec =
     { vec | z = z }
@@ -58,6 +77,7 @@ setZ z vec =
 ---- Operations ----
 
 
+{-| -}
 add : Vec3 -> Vec3 -> Vec3
 add v1 v2 =
     { x = v1.x + v2.x
@@ -66,11 +86,19 @@ add v1 v2 =
     }
 
 
+{-| -}
+sub : Vec3 -> Vec3 -> Vec3
+sub v1 v2 =
+    add v1 (scale -1 v2)
+
+
+{-| -}
 negate : Vec3 -> Vec3
 negate v =
     scale -1 v
 
 
+{-| -}
 scale : Float -> Vec3 -> Vec3
 scale factor v =
     { x = factor * v.x
@@ -79,12 +107,18 @@ scale factor v =
     }
 
 
+{-| -}
 dot : Vec3 -> Vec3 -> Float
 dot v1 v2 =
     v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
 
 
-{-| -}
+{-| Normalizes a vector.
+
+        normalize (vec3 0 3 4) = vec3 0 0.6 0.8
+        normalize (vec3 0 0 0) = vec3 0 0 0
+
+-}
 normalize : Vec3 -> Vec3
 normalize v =
     let
@@ -98,11 +132,42 @@ normalize v =
         v
 
 
+{-| -}
+cross : Vec3 -> Vec3 -> Vec3
+cross a b =
+    vec3 (a.y * b.z - a.z * b.y)
+        (a.z * b.x - a.x * b.z)
+        (a.x * b.y - a.y * b.x)
+
+
+{-| -}
 length : Vec3 -> Float
 length v =
     Basics.sqrt (lengthSquared v)
 
 
+{-| -}
 lengthSquared : Vec3 -> Float
-lengthSquared v =
-    v.x ^ 2 + v.y ^ 2 + v.z ^ 3
+lengthSquared { x, y, z } =
+    x ^ 2 + y ^ 2 + z ^ 2
+
+
+{-| -}
+distance : Vec3 -> Vec3 -> Float
+distance v1 v2 =
+    sub v1 v2
+        |> length
+
+
+{-| -}
+distanceSquared : Vec3 -> Vec3 -> Float
+distanceSquared v1 v2 =
+    sub v1 v2
+        |> lengthSquared
+
+
+{-| -}
+direction : { from : Vec3, to : Vec3 } -> Vec3
+direction { from, to } =
+    sub to from
+        |> normalize

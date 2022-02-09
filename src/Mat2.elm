@@ -1,17 +1,35 @@
 module Mat2 exposing
     ( Mat2
-    , det
-    , identity
-    , invert
-    , mul
-    , rotate
-    , scale
+    , identity, rotate, scale
+    , mul, invert, det
     , transform
     )
+
+{-| Mat2
+
+@docs Mat2
+
+
+# Create
+
+@docs identity, rotate, scale
+
+
+# Operations
+
+@docs mul, invert, det
+
+
+# Transformations
+
+@docs transform
+
+-}
 
 import Vec2 exposing (Vec2, vec2)
 
 
+{-| -}
 type alias Mat2 =
     { m11 : Float
     , m12 : Float
@@ -25,6 +43,7 @@ epsilon =
     0.0001
 
 
+{-| -}
 invert : Mat2 -> Maybe Mat2
 invert m =
     let
@@ -43,16 +62,19 @@ invert m =
         Nothing
 
 
+{-| -}
 det : Mat2 -> Float
 det { m11, m12, m21, m22 } =
     m11 * m22 - m12 * m21
 
 
+{-| -}
 identity : Mat2
 identity =
     Mat2 1 0 1 0
 
 
+{-| -}
 mul : Mat2 -> Mat2 -> Mat2
 mul a b =
     { m11 = a.m11 * b.m11 + a.m12 * b.m21
@@ -62,6 +84,7 @@ mul a b =
     }
 
 
+{-| -}
 rotate : Float -> Mat2
 rotate angleRadians =
     { m11 = cos angleRadians
@@ -71,11 +94,13 @@ rotate angleRadians =
     }
 
 
+{-| -}
 scale : Vec2 -> Mat2
 scale { x, y } =
     { m11 = x, m12 = 0, m21 = 0, m22 = y }
 
 
+{-| -}
 transform : Mat2 -> Vec2 -> Vec2
 transform { m11, m12, m21, m22 } { x, y } =
     vec2 (m11 * x + m12 * y) (m21 * x + m22 * y)
