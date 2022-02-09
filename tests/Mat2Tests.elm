@@ -28,11 +28,11 @@ transformTests =
         [ test "it works" <|
             \_ ->
                 Mat2.transform (Mat2.rotate pi) (vec2 1 0)
-                    |> Vec2Tests.within veryClose (vec2 -1 0)
-        , Test.fuzz (Fuzz.map2 Tuple.pair Vec2Tests.fuzzer Vec2Tests.fuzzer) "scale" <|
+                    |> Vec2Tests.compareVec2 (vec2 -1 0)
+        , Test.fuzz (Fuzz.map2 Tuple.pair Vec2Tests.vec2Fuzzer Vec2Tests.vec2Fuzzer) "scale" <|
             \( scaler, scaled ) ->
                 Mat2.transform (Mat2.scale scaler) scaled
-                    |> Vec2Tests.within veryClose (vec2 (scaled.x * scaler.x) (scaled.y * scaler.y))
+                    |> Vec2Tests.compareVec2 (vec2 (scaled.x * scaler.x) (scaled.y * scaler.y))
         ]
 
 
@@ -43,13 +43,13 @@ invertTests =
             \angle ->
                 Mat2.rotate angle
                     |> Mat2.invert
-                    |> Maybe.map (within veryClose (Mat2.rotate -angle))
+                    |> Maybe.map (compare veryClose (Mat2.rotate -angle))
                     |> Maybe.withDefault (Expect.fail "Not invertable matrix")
         , test "it works2" <|
             \_ ->
                 Mat2 3 1 4 2
                     |> Mat2.invert
-                    |> Maybe.map (within veryClose (Mat2 1 (-1 / 2) -2 (3 / 2)))
+                    |> Maybe.map (compare veryClose (Mat2 1 (-1 / 2) -2 (3 / 2)))
                     |> Maybe.withDefault (Expect.fail "Not invertable matrix")
         ]
 
@@ -70,8 +70,8 @@ veryClose =
     AbsoluteOrRelative 0.0001 0.0001
 
 
-within : FloatingPointTolerance -> Mat2 -> Mat2 -> Expectation
-within fp a b =
+compare : FloatingPointTolerance -> Mat2 -> Mat2 -> Expectation
+compare fp a b =
     Expect.all
         [ \_ -> Expect.within fp a.m11 b.m11
         , \_ -> Expect.within fp a.m12 b.m12

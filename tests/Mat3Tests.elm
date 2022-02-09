@@ -34,7 +34,7 @@ all =
                         Mat3.scale (vec2 2 3)
                 in
                 Mat3.transformPoint m (vec2 5 8)
-                    |> Vec2Tests.within veryClose (vec2 10 24)
+                    |> Vec2Tests.compareVec2 (vec2 10 24)
         , test "Mat3.translate affects points" <|
             \_ ->
                 let
@@ -42,7 +42,7 @@ all =
                         Mat3.translate (vec2 2 3)
                 in
                 Mat3.transformPoint m (vec2 5 8)
-                    |> Vec2Tests.within veryClose (vec2 7 11)
+                    |> Vec2Tests.compareVec2 (vec2 7 11)
         , test "Mat3.translate doesn't affect vectors" <|
             \_ ->
                 let
@@ -50,13 +50,8 @@ all =
                         Mat3.translate (vec2 2 3)
                 in
                 Mat3.transformVector m (vec2 5 8)
-                    |> Vec2Tests.within veryClose (vec2 5 8)
+                    |> Vec2Tests.compareVec2 (vec2 5 8)
         ]
-
-
-veryClose : FloatingPointTolerance
-veryClose =
-    AbsoluteOrRelative 0.0001 0.0001
 
 
 angleWithin : Float -> Float -> Float -> Expectation

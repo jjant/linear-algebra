@@ -177,17 +177,58 @@ scale { x, y, z } =
 lookAt : { eye : Vec3, centerOfAttention : Vec3, up : Vec3 } -> Mat4
 lookAt { eye, centerOfAttention, up } =
     let
-        forward =
-            Vec3.direction { from = eye, to = centerOfAttention }
+        z =
+            Vec3.direction { from = centerOfAttention, to = eye }
 
-        right =
-            Vec3.cross (Vec3.normalize up) forward
+        x =
+            Vec3.normalize (Vec3.cross up z)
 
-        realUp =
-            Vec3.cross forward right
+        y =
+            Vec3.normalize (Vec3.cross z x)
     in
-    fromRows
-        (vec4 right.x up.x forward.x eye.x)
-        (vec4 right.y up.y forward.y eye.y)
-        (vec4 right.z up.z forward.z eye.z)
-        (vec4 0 0 0 1)
+    mul
+        { m11 = x.x
+        , m21 = y.x
+        , m31 = z.x
+        , m41 = 0
+        , m12 = x.y
+        , m22 = y.y
+        , m32 = z.y
+        , m42 = 0
+        , m13 = x.z
+        , m23 = y.z
+        , m33 = z.z
+        , m43 = 0
+        , m14 = 0
+        , m24 = 0
+        , m34 = 0
+        , m44 = 1
+        }
+        { m11 = 1
+        , m21 = 0
+        , m31 = 0
+        , m41 = 0
+        , m12 = 0
+        , m22 = 1
+        , m32 = 0
+        , m42 = 0
+        , m13 = 0
+        , m23 = 0
+        , m33 = 1
+        , m43 = 0
+        , m14 = -eye.x
+        , m24 = -eye.y
+        , m34 = -eye.z
+        , m44 = 1
+        }
+
+
+unwrap : b -> Maybe a -> a
+unwrap b m =
+    case m of
+        Just a ->
+            a
+
+        Nothing ->
+            -- unwrap (Just (unwrap Nothing))
+            Debug.todo <| Debug.toString b

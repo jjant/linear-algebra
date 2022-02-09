@@ -84,8 +84,14 @@ fuzzWrapFloatVec name fn0 fn1 =
 compareVec3 : Vec3 -> Vec3 -> Expectation
 compareVec3 v1 v2 =
     Expect.all
-        [ \_ -> compareFloat v1.x v2.x
-        , \_ -> compareFloat v1.y v2.y
-        , \_ -> compareFloat v1.z v2.z
+        [ \_ ->
+            compareFloat v1.x v2.x
+                |> Expect.onFail "x"
+        , \_ ->
+            compareFloat v1.y v2.y
+                |> Expect.onFail "y"
+        , \_ ->
+            compareFloat v1.z v2.z
+                |> Expect.onFail "z"
         ]
         ()
