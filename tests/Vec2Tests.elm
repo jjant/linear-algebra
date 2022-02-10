@@ -1,6 +1,6 @@
 module Vec2Tests exposing (compareVec2, suite, vec2Fuzzer)
 
-import Expect exposing (Expectation, FloatingPointTolerance(..))
+import Expect exposing (Expectation)
 import Fuzz
 import Math.Vector2 as Math
 import Test exposing (..)
@@ -10,7 +10,7 @@ import Vec2 exposing (Vec2)
 
 suite : Test
 suite =
-    describe "Vector2!"
+    describe "Vec2"
         [ fuzzWrapFloatVec "setX" Math.setX Vec2.setX
         , fuzzWrapFloatVec "setY" Math.setY Vec2.setY
         , fuzzWrap2 "distance" Math.distance Vec2.distance
@@ -20,9 +20,9 @@ suite =
         , fuzzWrap "lengthSquared" Math.lengthSquared Vec2.lengthSquared
         , fuzzWrap2Vec "add" Math.add Vec2.add
         , fuzzWrap2Vec "sub" Math.sub Vec2.sub
-        , fuzzWrap2Vec "direction" (ignoreEquals Math.direction) (\a b -> Vec2.direction { from = b, to = a })
+        , fuzzWrap2Vec "direction" (Util.ignoreEquals (Math.vec2 0 0) Math.direction) (\a b -> Vec2.direction { from = b, to = a })
         , fuzzWrapVec "negate" Math.negate Vec2.negate
-        , fuzzWrapVec "normalize" (ignoreZero Math.normalize) Vec2.normalize
+        , fuzzWrapVec "normalize" (Util.ignoreZero (Math.vec2 0 0) Math.normalize) Vec2.normalize
         , fuzzWrapFloatVec "scale" Math.scale Vec2.scale
         ]
 
@@ -86,21 +86,3 @@ vec2Fuzzer =
     Fuzz.map2 (\x y -> { x = x, y = y })
         Fuzz.float
         Fuzz.float
-
-
-ignoreZero : (Math.Vec2 -> Math.Vec2) -> Math.Vec2 -> Math.Vec2
-ignoreZero f v =
-    if v == Math.vec2 0 0 then
-        v
-
-    else
-        f v
-
-
-ignoreEquals : (Math.Vec2 -> Math.Vec2 -> Math.Vec2) -> Math.Vec2 -> Math.Vec2 -> Math.Vec2
-ignoreEquals f v1 v2 =
-    if v1 == v2 then
-        Math.vec2 0 0
-
-    else
-        f v1 v2

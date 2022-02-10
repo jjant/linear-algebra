@@ -1,6 +1,6 @@
 module Vec4Tests exposing (suite)
 
-import Expect exposing (Expectation, FloatingPointTolerance(..))
+import Expect exposing (Expectation)
 import Fuzz
 import Math.Vector4 as Math
 import Test exposing (..)
@@ -10,23 +10,22 @@ import Vec4 exposing (Vec4)
 
 suite : Test
 suite =
-    describe "Vector4!"
+    describe "Vec4"
         [ fuzzWrapFloatVec "setW" Math.setW Vec4.setW
         , fuzzWrapFloatVec "setX" Math.setX Vec4.setX
         , fuzzWrapFloatVec "setY" Math.setY Vec4.setY
         , fuzzWrapFloatVec "setZ" Math.setZ Vec4.setZ
-
-        -- , fuzzWrap2 "distance" Math.distance Vec4.distance
-        -- , fuzzWrap2 "distanceSquared" Math.distanceSquared Vec4.distanceSquared
-        -- , fuzzWrap2 "dot" Math.dot Vec4.dot
-        -- , fuzzWrap "length" Math.length Vec4.length
-        -- , fuzzWrap "lengthSquared" Math.lengthSquared Vec4.lengthSquared
-        -- , fuzzWrap2Vec "add" Math.add Vec4.add
-        -- , fuzzWrap2Vec "sub" Math.sub Vec4.sub
-        -- , fuzzWrap2Vec "direction" Math.direction Vec4.direction
-        -- , fuzzWrapVec "negate" Math.negate Vec4.negate
-        -- , fuzzWrapVec "normalize" Math.normalize Vec4.normalize
-        -- , fuzzWrapFloatVec "scale" Math.scale Vec4.scale
+        , fuzzWrap2 "distance" Math.distance Vec4.distance
+        , fuzzWrap2 "distanceSquared" Math.distanceSquared Vec4.distanceSquared
+        , fuzzWrap2 "dot" Math.dot Vec4.dot
+        , fuzzWrap "length" Math.length Vec4.length
+        , fuzzWrap "lengthSquared" Math.lengthSquared Vec4.lengthSquared
+        , fuzzWrap2Vec "add" Math.add Vec4.add
+        , fuzzWrap2Vec "sub" Math.sub Vec4.sub
+        , fuzzWrap2Vec "direction" (Util.ignoreEquals (Math.vec4 0 0 0 0) Math.direction) (\a b -> Vec4.direction { from = b, to = a })
+        , fuzzWrapVec "negate" Math.negate Vec4.negate
+        , fuzzWrapVec "normalize" (Util.ignoreZero (Math.vec4 0 0 0 0) Math.normalize) Vec4.normalize
+        , fuzzWrapFloatVec "scale" Math.scale Vec4.scale
         ]
 
 

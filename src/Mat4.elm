@@ -228,12 +228,12 @@ lookAt { eye, centerOfAttention, up } =
         Nothing
 
 
-unwrap : b -> Maybe a -> a
-unwrap b m =
-    case m of
-        Just a ->
-            a
 
-        Nothing ->
-            -- unwrap (Just (unwrap Nothing))
-            Debug.todo <| Debug.toString b
+-- unwrap : b -> Maybe a -> a
+-- unwrap b m =
+--     case m of
+--         Just a ->
+--             a
+--         Nothing ->
+--             -- unwrap (Just (unwrap Nothing))
+--             Debug.todo <| Debug.toString b

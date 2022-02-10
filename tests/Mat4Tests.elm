@@ -5,14 +5,13 @@ import Fuzz
 import Mat4 exposing (Mat4)
 import Math.Matrix4 as Math
 import Math.Vector3 as MathVec3
-import Test exposing (Test, describe, fuzz, fuzz2, fuzz3, skip, test)
-import Vec3
+import Test exposing (Test, describe, fuzz, fuzz2, fuzz3, test)
 import Vec3Tests exposing (vec3Fuzzer)
 
 
 suite : Test
 suite =
-    describe "Matrix4!"
+    describe "Mat4"
         [ test "identity" <|
             \_ ->
                 compare Mat4.identity (Math.toRecord Math.identity)
@@ -175,7 +174,7 @@ compareMaybes f ma mb =
         ( Nothing, Nothing ) ->
             Expect.pass
 
-        ( _, _ ) ->
+        _ ->
             Expect.fail "Differing maybes"
 
 
