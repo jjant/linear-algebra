@@ -22,7 +22,16 @@ suite =
         , fuzzWrap2Vec "sub" Math.sub Vec2.sub
         , fuzzWrap2Vec "direction" Math.direction (\a b -> Vec2.direction { from = b, to = a })
         , fuzzWrapVec "negate" Math.negate Vec2.negate
-        , fuzzWrapVec "normalize" Math.normalize Vec2.normalize
+        , fuzzWrapVec "normalize"
+            (\v ->
+                -- We know Vec2.normalize differs for zero.
+                if v == Math.vec2 0 0 then
+                    v
+
+                else
+                    Math.normalize v
+            )
+            Vec2.normalize
         , fuzzWrapFloatVec "scale" Math.scale Vec2.scale
         ]
 
@@ -69,12 +78,16 @@ compareVec2 v1 v2 =
     Expect.all
         [ \_ ->
             compareFloat v1.x v2.x
-                |> Expect.onFail "x"
         , \_ ->
             compareFloat v1.y v2.y
-                |> Expect.onFail "y"
         ]
         ()
+        |> Expect.onFail (vec2Error v1 v2)
+
+
+vec2Error : Vec2 -> Vec2 -> String
+vec2Error v1 v2 =
+    "v1:\n\t" ++ Vec2.toString v1 ++ "\nv2:\n\t" ++ Vec2.toString v2
 
 
 vec2Fuzzer : Fuzz.Fuzzer Vec2
