@@ -1,4 +1,4 @@
-module Util exposing (compareFloat, epsilon, infinity)
+module Util exposing (compareFloat, ignoreEquals, ignoreZero)
 
 import Expect exposing (Expectation, FloatingPointTolerance(..))
 
@@ -8,11 +8,6 @@ epsilon =
     2 ^ -52
 
 
-infinity : Float
-infinity =
-    1 / 0
-
-
 compareFloat : Float -> Float -> Expectation
 compareFloat a b =
     if isNaN a && isNaN b then
@@ -20,3 +15,21 @@ compareFloat a b =
 
     else
         Expect.within (Absolute epsilon) a b
+
+
+ignoreZero : a -> (a -> a) -> a -> a
+ignoreZero zero f v =
+    if v == zero then
+        v
+
+    else
+        f v
+
+
+ignoreEquals : a -> (a -> a -> a) -> a -> a -> a
+ignoreEquals zero f v1 v2 =
+    if v1 == v2 then
+        zero
+
+    else
+        f v1 v2

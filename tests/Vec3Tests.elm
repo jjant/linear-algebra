@@ -1,6 +1,6 @@
 module Vec3Tests exposing (suite, vec3Fuzzer)
 
-import Expect exposing (Expectation, FloatingPointTolerance(..))
+import Expect exposing (Expectation)
 import Fuzz
 import Math.Vector3 as Math
 import Test exposing (..)
@@ -10,7 +10,7 @@ import Vec3 exposing (Vec3)
 
 suite : Test
 suite =
-    describe "Vector3!"
+    describe "Vec3"
         [ fuzzWrapFloatVec "setX" Math.setX Vec3.setX
         , fuzzWrapFloatVec "setY" Math.setY Vec3.setY
         , fuzzWrapFloatVec "setZ" Math.setZ Vec3.setZ

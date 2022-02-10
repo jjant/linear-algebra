@@ -5,14 +5,13 @@ import Fuzz
 import Mat4 exposing (Mat4)
 import Math.Matrix4 as Math
 import Math.Vector3 as MathVec3
-import Test exposing (..)
-import Vec3
+import Test exposing (Test, describe, fuzz, fuzz2, fuzz3, test)
 import Vec3Tests exposing (vec3Fuzzer)
 
 
 suite : Test
 suite =
-    describe "Matrix4!"
+    describe "Mat4"
         [ test "identity" <|
             \_ ->
                 compare Mat4.identity (Math.toRecord Math.identity)
@@ -101,9 +100,12 @@ suite =
         --             (Math.makeOrtho2D f1 f2 f3 f4 |> Math.toRecord)
         , fuzz3 vec3Fuzzer vec3Fuzzer vec3Fuzzer "makeLookAt" <|
             \eye centerOfAttention up ->
-                compareCustom 0.000002
-                    (Mat4.lookAt { eye = eye, centerOfAttention = centerOfAttention, up = up })
-                    (Math.makeLookAt (MathVec3.fromRecord eye) (MathVec3.fromRecord centerOfAttention) (MathVec3.fromRecord up) |> Math.toRecord)
+                Mat4.lookAt { eye = eye, centerOfAttention = centerOfAttention, up = up }
+                    |> Maybe.map
+                        (compareCustom 0.000002
+                            (Math.makeLookAt (MathVec3.fromRecord eye) (MathVec3.fromRecord centerOfAttention) (MathVec3.fromRecord up) |> Math.toRecord)
+                        )
+                    |> Maybe.withDefault Expect.pass
 
         -- , fuzz3 Fuzz.float vec3Fuzzer mat4Fuzzer "rotate" <|
         --     \f v r ->
@@ -172,7 +174,7 @@ compareMaybes f ma mb =
         ( Nothing, Nothing ) ->
             Expect.pass
 
-        ( _, _ ) ->
+        _ ->
             Expect.fail "Differing maybes"
 
 
