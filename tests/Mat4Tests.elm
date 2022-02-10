@@ -99,14 +99,14 @@ suite =
         --             , compare (Tuple.makeOrtho2D f1 f2 f3 f4 |> Tuple.toRecord)
         --             ]
         --             (Math.makeOrtho2D f1 f2 f3 f4 |> Math.toRecord)
-        , skip <|
-            -- Skip for now
-            fuzz3 vec3Fuzzer vec3Fuzzer vec3Fuzzer "makeLookAt"
-            <|
-                \eye centerOfAttention up ->
-                    compareCustom 0.000002
-                        (Mat4.lookAt { eye = eye, centerOfAttention = centerOfAttention, up = up })
-                        (Math.makeLookAt (MathVec3.fromRecord eye) (MathVec3.fromRecord centerOfAttention) (MathVec3.fromRecord up) |> Math.toRecord)
+        , fuzz3 vec3Fuzzer vec3Fuzzer vec3Fuzzer "makeLookAt" <|
+            \eye centerOfAttention up ->
+                Mat4.lookAt { eye = eye, centerOfAttention = centerOfAttention, up = up }
+                    |> Maybe.map
+                        (compareCustom 0.000002
+                            (Math.makeLookAt (MathVec3.fromRecord eye) (MathVec3.fromRecord centerOfAttention) (MathVec3.fromRecord up) |> Math.toRecord)
+                        )
+                    |> Maybe.withDefault Expect.pass
 
         -- , fuzz3 Fuzz.float vec3Fuzzer mat4Fuzzer "rotate" <|
         --     \f v r ->

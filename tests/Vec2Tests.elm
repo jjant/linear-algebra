@@ -20,18 +20,9 @@ suite =
         , fuzzWrap "lengthSquared" Math.lengthSquared Vec2.lengthSquared
         , fuzzWrap2Vec "add" Math.add Vec2.add
         , fuzzWrap2Vec "sub" Math.sub Vec2.sub
-        , fuzzWrap2Vec "direction" Math.direction (\a b -> Vec2.direction { from = b, to = a })
+        , fuzzWrap2Vec "direction" (ignoreEquals Math.direction) (\a b -> Vec2.direction { from = b, to = a })
         , fuzzWrapVec "negate" Math.negate Vec2.negate
-        , fuzzWrapVec "normalize"
-            (\v ->
-                -- We know Vec2.normalize differs for zero.
-                if v == Math.vec2 0 0 then
-                    v
-
-                else
-                    Math.normalize v
-            )
-            Vec2.normalize
+        , fuzzWrapVec "normalize" (ignoreZero Math.normalize) Vec2.normalize
         , fuzzWrapFloatVec "scale" Math.scale Vec2.scale
         ]
 
@@ -95,3 +86,21 @@ vec2Fuzzer =
     Fuzz.map2 (\x y -> { x = x, y = y })
         Fuzz.float
         Fuzz.float
+
+
+ignoreZero : (Math.Vec2 -> Math.Vec2) -> Math.Vec2 -> Math.Vec2
+ignoreZero f v =
+    if v == Math.vec2 0 0 then
+        v
+
+    else
+        f v
+
+
+ignoreEquals : (Math.Vec2 -> Math.Vec2 -> Math.Vec2) -> Math.Vec2 -> Math.Vec2 -> Math.Vec2
+ignoreEquals f v1 v2 =
+    if v1 == v2 then
+        Math.vec2 0 0
+
+    else
+        f v1 v2
