@@ -64,7 +64,7 @@ setW w vec =
 
 
 toString : Vec4 -> String
-toString { x, y } =
+toString { x, y, z, w } =
     "{ "
         ++ "x = "
         ++ String.fromFloat x
