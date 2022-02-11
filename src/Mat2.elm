@@ -1,6 +1,6 @@
 module Mat2 exposing
     ( Mat2
-    , identity, rotate, scale
+    , identity, fromRows, rotate, scale
     , mul, invert, det
     , transform
     )
@@ -12,7 +12,7 @@ module Mat2 exposing
 
 # Create
 
-@docs identity, rotate, scale
+@docs identity, fromRows, rotate, scale
 
 
 # Operations
@@ -38,11 +38,6 @@ type alias Mat2 =
     }
 
 
-epsilon : Float
-epsilon =
-    0.0001
-
-
 {-| -}
 invert : Mat2 -> Maybe Mat2
 invert m =
@@ -50,7 +45,7 @@ invert m =
         d =
             det m
     in
-    if abs d > epsilon then
+    if d /= 0 then
         Just
             { m11 = m.m22 / d
             , m12 = -m.m12 / d
@@ -71,7 +66,21 @@ det { m11, m12, m21, m22 } =
 {-| -}
 identity : Mat2
 identity =
-    Mat2 1 0 1 0
+    Mat2 1 0 0 1
+
+
+{-| Create a matrix out of vectors representing its rows.
+
+You probably won't need this too often.
+
+-}
+fromRows : Vec2 -> Vec2 -> Mat2
+fromRows row1 row2 =
+    { m11 = row1.x
+    , m12 = row1.y
+    , m21 = row2.x
+    , m22 = row2.y
+    }
 
 
 {-| -}
@@ -97,7 +106,11 @@ rotate angleRadians =
 {-| -}
 scale : Vec2 -> Mat2
 scale { x, y } =
-    { m11 = x, m12 = 0, m21 = 0, m22 = y }
+    { m11 = x
+    , m12 = 0
+    , m21 = 0
+    , m22 = y
+    }
 
 
 {-| -}

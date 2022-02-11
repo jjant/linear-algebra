@@ -1,4 +1,11 @@
-module Util exposing (compareFloat, ignoreEquals, ignoreZero)
+module Util exposing
+    ( compareFloat
+    , compareMaybes
+    , comparePrecision
+    , epsilon
+    , ignoreEquals
+    , ignoreZero
+    )
 
 import Expect exposing (Expectation, FloatingPointTolerance(..))
 
@@ -33,3 +40,25 @@ ignoreEquals zero f v1 v2 =
 
     else
         f v1 v2
+
+
+comparePrecision : Float -> Float -> Float -> Expectation
+comparePrecision precision a b =
+    if isNaN a && isNaN b then
+        Expect.pass
+
+    else
+        Expect.within (Absolute precision) a b
+
+
+compareMaybes : (a -> b -> Expectation) -> Maybe a -> Maybe b -> Expectation
+compareMaybes f ma mb =
+    case ( ma, mb ) of
+        ( Just a, Just b ) ->
+            f a b
+
+        ( Nothing, Nothing ) ->
+            Expect.pass
+
+        _ ->
+            Expect.fail "Differing maybes"

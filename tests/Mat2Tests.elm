@@ -1,11 +1,52 @@
-module Mat2Tests exposing (..)
+module Mat2Tests exposing (suite)
 
 import Expect exposing (Expectation, FloatingPointTolerance(..))
 import Fuzz
 import Mat2 exposing (Mat2)
-import Test exposing (Test, describe, test)
+import Test exposing (Test, describe, fuzz, fuzz2, test)
+import Util exposing (comparePrecision)
 import Vec2 exposing (vec2)
 import Vec2Tests
+
+
+suite : Test
+suite =
+    describe "Mat2"
+        [ describe "invert"
+            [ test "Identity is its own inverse" <|
+                \_ ->
+                    Mat2.invert Mat2.identity
+                        |> Expect.equal (Just Mat2.identity)
+            , fuzz2 (Fuzz.floatRange 1 500)
+                (Fuzz.floatRange 1 500)
+                "Scaling in 2D inverts to shrinking"
+              <|
+                \x y ->
+                    Mat2.scale (vec2 x y)
+                        |> Mat2.invert
+                        |> Util.compareMaybes compare (Just (Mat2.scale (vec2 (1 / x) (1 / y))))
+            , fuzz Fuzz.float "Rotation" <|
+                \theta ->
+                    let
+                        m =
+                            Mat2.rotate theta
+                    in
+                    m
+                        |> Mat2.invert
+                        |> Maybe.map (Mat2.mul m)
+                        |> Maybe.map (compare Mat2.identity)
+                        |> Maybe.withDefault (Expect.fail "Couldn't invert")
+            , test "cannot invert a singular matrix" <|
+                \_ ->
+                    Mat2.fromRows (vec2 1 1) (vec2 0 0)
+                        |> Mat2.invert
+                        |> Expect.equal Nothing
+            ]
+        , mulTests
+        , transformTests
+        , invertTests
+        , detTests
+        ]
 
 
 mulTests : Test
@@ -43,13 +84,13 @@ invertTests =
             \angle ->
                 Mat2.rotate angle
                     |> Mat2.invert
-                    |> Maybe.map (compare veryClose (Mat2.rotate -angle))
+                    |> Maybe.map (compare (Mat2.rotate -angle))
                     |> Maybe.withDefault (Expect.fail "Not invertable matrix")
         , test "it works2" <|
             \_ ->
                 Mat2 3 1 4 2
                     |> Mat2.invert
-                    |> Maybe.map (compare veryClose (Mat2 1 (-1 / 2) -2 (3 / 2)))
+                    |> Maybe.map (compare (Mat2 1 (-1 / 2) -2 (3 / 2)))
                     |> Maybe.withDefault (Expect.fail "Not invertable matrix")
         ]
 
@@ -62,6 +103,11 @@ detTests =
                 Mat2 1 2 3 4
                     |> Mat2.det
                     |> Expect.within veryClose -2
+        , test "identity has determinant 1" <|
+            \_ ->
+                Mat2.identity
+                    |> Mat2.det
+                    |> Util.compareFloat 1
         ]
 
 
@@ -70,12 +116,17 @@ veryClose =
     AbsoluteOrRelative 0.0001 0.0001
 
 
-compare : FloatingPointTolerance -> Mat2 -> Mat2 -> Expectation
-compare fp a b =
+compare : Mat2 -> Mat2 -> Expectation
+compare =
+    compareCustom 0.000001
+
+
+compareCustom : Float -> Mat2 -> Mat2 -> Expectation
+compareCustom fp a b =
     Expect.all
-        [ \_ -> Expect.within fp a.m11 b.m11
-        , \_ -> Expect.within fp a.m12 b.m12
-        , \_ -> Expect.within fp a.m21 b.m21
-        , \_ -> Expect.within fp a.m22 b.m22
+        [ \_ -> comparePrecision fp a.m11 b.m11
+        , \_ -> comparePrecision fp a.m12 b.m12
+        , \_ -> comparePrecision fp a.m21 b.m21
+        , \_ -> comparePrecision fp a.m22 b.m22
         ]
         ()
