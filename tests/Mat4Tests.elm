@@ -149,12 +149,7 @@ suite =
         --             (Math.translate3 f1 f2 f3 (Math.fromRecord r) |> Math.toRecord)
         -- , fuzz2 Fuzz.float vec3Fuzzer "makeRotate" <|
         --     \f v ->
-        --         Expect.all
-        --             [ compare (Mat4.makeRotate f v.adt |> Mat4.toRecord)
-        --             , compare (Record.makeRotate f v.mat4Fuzzer |> Record.toRecord)
-        --             , compare (Tuple.makeRotate f v.tuple |> Tuple.toRecord)
-        --             ]
-        --             (Math.makeRotate f v.math |> Math.toRecord)
+        --         compare (Mat4.rotate f v) (Math.makeRotate f (MathVec3.fromRecord v) |> Math.toRecord)
         , fuzz vec3Fuzzer "makeScale" <|
             \v ->
                 compare (Mat4.scale v)

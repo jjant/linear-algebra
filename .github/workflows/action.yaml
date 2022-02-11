@@ -18,7 +18,7 @@ jobs:
         run: ./node_modules/elm-test/bin/elm-test
       - name: elm-review
         run: node_modules/elm-review/bin/elm-review  --template jfmengels/elm-review-unused/example
-      # - name: check documentation
-      #   run: |
-      #     elm make --docs=docs.json
-      #     rm docs.json
+      - name: check documentation
+        run: |
+          elm make --docs=docs.json
+          rm docs.json

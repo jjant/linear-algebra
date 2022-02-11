@@ -1,11 +1,37 @@
 module Mat4 exposing
-    ( Mat4
-    , identity, invert, lookAt, mul, scale, translate
+    ( Mat4, identity
+    , invert, mul, transpose, transform
+    , lookAt
+    , rotate, scale, translate
     )
 
-{-| Mat4
+{-| This library uses the convention that the prefix `make` is creating a new
+array,as without the prefix, you are applying some transform to an
+existing matrix.
 
-@docs Mat4
+
+# Create
+
+@docs Mat4, identity
+
+
+# Operations
+
+@docs invert, mul, transpose, transform
+
+-- @docs makeBasis
+
+
+# Projections
+
+@docs lookAt
+
+-- @docs makeFrustum, makePerspective, makeOrtho, makeOrtho2D,
+
+
+# Create Transformations
+
+@docs rotate, scale, translate
 
 -}
 
@@ -50,6 +76,17 @@ identity =
         (vec4 0 0 0 1)
 
 
+{-| -}
+transpose : Mat4 -> Mat4
+transpose { m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44 } =
+    fromRows
+        (vec4 m11 m21 m31 m41)
+        (vec4 m12 m22 m32 m42)
+        (vec4 m13 m23 m33 m43)
+        (vec4 m14 m24 m34 m44)
+
+
+{-| -}
 invert : Mat4 -> Maybe Mat4
 invert m =
     let
@@ -131,6 +168,7 @@ invert m =
             }
 
 
+{-| -}
 mul : Mat4 -> Mat4 -> Mat4
 mul a b =
     { m11 = a.m11 * b.m11 + a.m12 * b.m21 + a.m13 * b.m31 + a.m14 * b.m41
@@ -152,6 +190,7 @@ mul a b =
     }
 
 
+{-| -}
 translate : Vec3 -> Mat4
 translate { x, y, z } =
     fromRows
@@ -161,6 +200,7 @@ translate { x, y, z } =
         (vec4 0 0 0 1)
 
 
+{-| -}
 scale : Vec3 -> Mat4
 scale { x, y, z } =
     fromRows
@@ -170,10 +210,17 @@ scale { x, y, z } =
         (vec4 0 0 0 1)
 
 
+{-| -}
+rotate : Float -> Vec3 -> Mat4
+rotate =
+    Debug.todo "Mat4.rotate"
+
+
 
 ---- Projections ----
 
 
+{-| -}
 lookAt : { eye : Vec3, centerOfAttention : Vec3, up : Vec3 } -> Maybe Mat4
 lookAt { eye, centerOfAttention, up } =
     let
@@ -226,6 +273,16 @@ lookAt { eye, centerOfAttention, up } =
 
     else
         Nothing
+
+
+{-| -}
+transform : Mat4 -> Vec4 -> Vec4
+transform { m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44 } { x, y, z, w } =
+    vec4
+        (m11 * x + m12 * y + m13 * z + m14 * w)
+        (m21 * x + m22 * y + m23 * z + m24 * w)
+        (m31 * x + m32 * y + m33 * z + m34 * w)
+        (m41 * x + m42 * y + m43 * z + m44 * w)
 
 
 

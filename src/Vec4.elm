@@ -1,19 +1,30 @@
 module Vec4 exposing
-    ( Vec4
-    , vec4
+    ( Vec4, vec4, zero
+    , setX, setY, setZ, setW
+    , add, sub, negate, scale, dot, normalize, direction
+    , length, lengthSquared, distance, distanceSquared
     , toString
-    , add, direction, distance, distanceSquared, dot, length, lengthSquared, negate, normalize, scale, setW, setX, setY, setZ, sub
     )
 
-{-| Vec4
-
-@docs Vec4
+{-|
 
 
 # Create
 
-@docs vec4
+@docs Vec4, vec4, zero
 
+
+# Get and Set
+
+The set functions create a new copy of the vector, updating a single field.
+
+@docs setX, setY, setZ, setW
+
+
+# Operations
+
+@docs add, sub, negate, scale, dot, normalize, direction
+@docs length, lengthSquared, distance, distanceSquared
 @docs toString
 
 -}
@@ -33,6 +44,12 @@ type alias Vec4 =
 vec4 : Float -> Float -> Float -> Float -> Vec4
 vec4 =
     Vec4
+
+
+{-| -}
+zero : Vec4
+zero =
+    vec4 0 0 0 0
 
 
 
@@ -107,6 +124,7 @@ lengthSquared { x, y, z, w } =
     x ^ 2 + y ^ 2 + z ^ 2 + w ^ 2
 
 
+{-| -}
 normalize : Vec4 -> Vec4
 normalize v =
     let
@@ -147,6 +165,7 @@ direction { from, to } =
         |> normalize
 
 
+{-| -}
 toString : Vec4 -> String
 toString { x, y, z, w } =
     "{ "
