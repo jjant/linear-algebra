@@ -3,7 +3,7 @@ module Mat3 exposing
     , identity, fromRows, rotate, scale, translate
     , transpose, mul
     , transform, transformVector, transformPoint
-    , lookAt, orthographic
+    , lookAt, orthographic, viewport
     )
 
 {-| Mat3
@@ -30,7 +30,7 @@ module Mat3 exposing
 
 # Projections
 
-@docs lookAt, orthographic
+@docs lookAt, orthographic, viewport
 
 -}
 
@@ -214,6 +214,54 @@ orthographic { width, height } =
         (vec3 (2 / width) 0 0)
         (vec3 0 (2 / height) 0)
         (vec3 0 0 1)
+
+
+{-| Transforms clip space into viewport space.
+
+    --      Clip space
+    --
+    --                ^ +1
+    --                |
+    --                |
+    --                |
+    --   -1         y |           +1
+    --   <--------- (0,0) --------->
+    --                |  x
+    --                |
+    --                |
+    --                |
+    --                v -1
+    --
+    --
+    --
+    --
+    --
+    --      Viewport space
+    --                       width
+    --        (0,0)------------>
+    --          |
+    --          |
+    --          |
+    --          |
+    --          v
+    --        height
+    --
+    --
+
+
+
+-}
+viewport : { width : Float, height : Float } -> Mat3
+viewport { width, height } =
+    -- Start in clip space: [-1, 1] x [-1, 1]
+    -- [0, 2] x [0, 2]
+    translate (vec2 1 1)
+        -- [0, 1] x [0, -1]
+        |> mul (scale (vec2 0.5 -0.5))
+        -- [0, width] x [0, -height]
+        |> mul (scale (vec2 width height))
+        -- [0, width] x [height, 0]
+        |> mul (translate (vec2 0 height))
 
 
 
