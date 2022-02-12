@@ -389,21 +389,24 @@ orthographic { left, right, bottom, top, zNear, zFar } =
     }
 
 
-{-| -}
+{-| Transforms a point, applying scaling, rotation, and translation.
+-}
 transformPoint : Mat4 -> Vec3 -> Vec3
 transformPoint m v =
     transform m (Vec3.point v)
         |> Vec3.fromHomogeneous
 
 
-{-| -}
+{-| Transforms a vector, applying scaling and rotation, but not translation.
+-}
 transformVector : Mat4 -> Vec3 -> Vec3
 transformVector m v =
     transform m (Vec3.vector v)
         |> Vec3.fromHomogeneous
 
 
-{-| -}
+{-| Transforms a general 4D vector.
+-}
 transform : Mat4 -> Vec4 -> Vec4
 transform { m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44 } { x, y, z, w } =
     vec4
