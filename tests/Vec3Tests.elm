@@ -5,7 +5,7 @@ import Fuzz
 import Math.Vector3 as Math
 import Test exposing (..)
 import Util exposing (compareFloat)
-import Vec3 exposing (Vec3)
+import Vec3 exposing (Vec3, vec3)
 
 
 suite : Test
@@ -26,7 +26,7 @@ suite =
         , fuzzWrapVec "negate" Math.negate Vec3.negate
         , test "normalize 0 == 0" <|
             \_ ->
-                compareVec3 (Vec3.normalize (Vec3.vec3 0 0 0)) (Vec3.vec3 0 0 0)
+                compareVec3 (Vec3.normalize (vec3 0 0 0)) (vec3 0 0 0)
         , fuzzWrapVec "normalize"
             -- Vec3.normalize and Math.normalize differ in how they treat zero.
             (\v ->
@@ -38,6 +38,18 @@ suite =
             )
             Vec3.normalize
         , fuzzWrapFloatVec "scale" Math.scale Vec3.scale
+        , test "i is the x unit vector" <|
+            \_ ->
+                Vec3.i
+                    |> Expect.equal (vec3 1 0 0)
+        , test "j is the y unit vector" <|
+            \_ ->
+                Vec3.j
+                    |> Expect.equal (vec3 0 1 0)
+        , test "k is the z unit vector" <|
+            \_ ->
+                Vec3.k
+                    |> Expect.equal (vec3 0 0 1)
         ]
 
 

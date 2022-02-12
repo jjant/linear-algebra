@@ -1,7 +1,7 @@
 module Mat2 exposing
     ( Mat2
     , identity, fromRows, rotate, scale
-    , mul, invert, det
+    , mul, invert, transpose, det
     , transform
     )
 
@@ -17,7 +17,7 @@ module Mat2 exposing
 
 # Operations
 
-@docs mul, invert, det
+@docs mul, invert, transpose, det
 
 
 # Transformations
@@ -55,6 +55,12 @@ invert m =
 
     else
         Nothing
+
+
+{-| -}
+transpose : Mat2 -> Mat2
+transpose { m11, m12, m21, m22 } =
+    { m11 = m11, m12 = m21, m21 = m12, m22 = m22 }
 
 
 {-| -}

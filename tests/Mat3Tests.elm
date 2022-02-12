@@ -6,6 +6,7 @@ import Mat3
 import Test exposing (Test, describe, test)
 import Vec2 exposing (Vec2, vec2)
 import Vec2Tests
+import Vec3 exposing (vec3)
 
 
 all : Test
@@ -51,6 +52,26 @@ all =
                 in
                 Mat3.transformVector m (vec2 5 8)
                     |> Vec2Tests.compareVec2 (vec2 5 8)
+        , describe "tranpose"
+            [ test "transpose identity is identity" <|
+                \_ ->
+                    Mat3.identity
+                        |> Mat3.transpose
+                        |> Expect.equal Mat3.identity
+            , test "transpose of a specific matrix" <|
+                \_ ->
+                    Mat3.fromRows
+                        (vec3 5 25 1)
+                        (vec3 9 43 4)
+                        (vec3 9 1 0)
+                        |> Mat3.transpose
+                        |> Expect.equal
+                            (Mat3.fromRows
+                                (vec3 5 9 9)
+                                (vec3 25 43 1)
+                                (vec3 1 4 0)
+                            )
+            ]
         ]
 
 

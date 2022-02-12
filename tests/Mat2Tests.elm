@@ -2,7 +2,7 @@ module Mat2Tests exposing (suite)
 
 import Expect exposing (Expectation, FloatingPointTolerance(..))
 import Fuzz
-import Mat2 exposing (Mat2)
+import Mat2 exposing (Mat2, transpose)
 import Test exposing (Test, describe, fuzz, fuzz2, test)
 import Util exposing (comparePrecision)
 import Vec2 exposing (vec2)
@@ -46,6 +46,34 @@ suite =
         , transformTests
         , invertTests
         , detTests
+        , describe "transpose"
+            [ test "transpose identity is identity" <|
+                \_ ->
+                    Mat2.identity
+                        |> Mat2.transpose
+                        |> Expect.equal Mat2.identity
+            , test "transpose of a specific matrix" <|
+                \_ ->
+                    Mat2.fromRows
+                        (vec2 5 25)
+                        (vec2 9 43)
+                        |> Mat2.transpose
+                        |> Expect.equal
+                            (Mat2.fromRows
+                                (vec2 5 9)
+                                (vec2 25 43)
+                            )
+            , fuzz (Fuzz.floatRange 0 (2 * pi)) "transpose of rotation matrix is its inverse" <|
+                \theta ->
+                    let
+                        m =
+                            Mat2.rotate theta
+                    in
+                    m
+                        |> transpose
+                        |> Just
+                        |> Util.compareMaybes compare (Mat2.invert m)
+            ]
         ]
 
 
