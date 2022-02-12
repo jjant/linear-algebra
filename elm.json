@@ -2,7 +2,7 @@
     "type": "package",
     "name": "jjant/linear-algebra",
     "summary": "Fast linear algebra in Elm",
-    "license": "BSD-3-Clause",
+    "license": "MIT",
     "version": "1.0.0",
     "exposed-modules": [
         "Vec2",
