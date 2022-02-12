@@ -1,8 +1,9 @@
 module Vec3 exposing
-    ( Vec3, vec3, zero
+    ( Vec3, vec3, zero, i, j, k
     , setX, setY, setZ
     , add, sub, negate, scale, dot, cross, normalize, direction
     , length, lengthSquared, distance, distanceSquared
+    , point, vector, fromHomogeneous
     )
 
 {-| Vec3
@@ -10,7 +11,7 @@ module Vec3 exposing
 
 # Create
 
-@docs Vec3, vec3, zero
+@docs Vec3, vec3, zero, i, j, k
 
 
 # Setters
@@ -23,7 +24,14 @@ module Vec3 exposing
 @docs add, sub, negate, scale, dot, cross, normalize, direction
 @docs length, lengthSquared, distance, distanceSquared
 
+
+# Homogeneous coordinates
+
+@docs point, vector, fromHomogeneous
+
 -}
+
+import Vec4 exposing (Vec4)
 
 
 {-| Vec3
@@ -49,6 +57,24 @@ vec3 =
 zero : Vec3
 zero =
     vec3 0 0 0
+
+
+{-| -}
+i : Vec3
+i =
+    vec3 1 0 0
+
+
+{-| -}
+j : Vec3
+j =
+    vec3 0 1 0
+
+
+{-| -}
+k : Vec3
+k =
+    vec3 0 0 1
 
 
 
@@ -171,3 +197,26 @@ direction : { from : Vec3, to : Vec3 } -> Vec3
 direction { from, to } =
     sub to from
         |> normalize
+
+
+{-| -}
+fromHomogeneous : Vec4 -> Vec3
+fromHomogeneous v4 =
+    {- TODO: Not sure if this is correct/good/etc. PROBABLY not. -}
+    if v4.w /= 0 then
+        vec3 (v4.x / v4.w) (v4.y / v4.w) (v4.z / v4.w)
+
+    else
+        vec3 v4.x v4.y v4.z
+
+
+{-| -}
+point : Vec3 -> Vec4
+point { x, y, z } =
+    { x = x, y = y, z = z, w = 1 }
+
+
+{-| -}
+vector : Vec3 -> Vec4
+vector { x, y, z } =
+    { x = x, y = y, z = z, w = 0 }

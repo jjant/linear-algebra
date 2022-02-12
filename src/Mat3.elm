@@ -1,6 +1,7 @@
 module Mat3 exposing
     ( Mat3
-    , identity, rotate, scale, translate
+    , identity, fromRows, rotate, scale, translate
+    , transpose
     , transform, transformVector, transformPoint
     )
 
@@ -11,10 +12,12 @@ module Mat3 exposing
 
 # Create
 
-@docs identity, rotate, scale, translate
+@docs identity, fromRows, rotate, scale, translate
 
 
 # Operations
+
+@docs transpose
 
 {mul, det,invert}
 
@@ -55,6 +58,36 @@ identity =
     , m31 = 0
     , m32 = 0
     , m33 = 1
+    }
+
+
+{-| -}
+fromRows : Vec3 -> Vec3 -> Vec3 -> Mat3
+fromRows row1 row2 row3 =
+    { m11 = row1.x
+    , m12 = row1.y
+    , m13 = row1.z
+    , m21 = row2.x
+    , m22 = row2.y
+    , m23 = row2.z
+    , m31 = row3.x
+    , m32 = row3.y
+    , m33 = row3.z
+    }
+
+
+{-| -}
+transpose : Mat3 -> Mat3
+transpose { m11, m12, m13, m21, m22, m23, m31, m32, m33 } =
+    { m11 = m11
+    , m12 = m21
+    , m13 = m31
+    , m21 = m12
+    , m22 = m22
+    , m23 = m32
+    , m31 = m13
+    , m32 = m23
+    , m33 = m33
     }
 
 

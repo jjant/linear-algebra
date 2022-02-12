@@ -302,6 +302,7 @@ left =
 -}
 fromHomogeneous : Vec3 -> Vec2
 fromHomogeneous v3 =
+    {- TODO: Not sure if this is correct/good/etc. PROBABLY not. -}
     if v3.z /= 0 then
         vec2 (v3.x / v3.z) (v3.y / v3.z)
 

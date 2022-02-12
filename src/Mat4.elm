@@ -1,11 +1,34 @@
 module Mat4 exposing
     ( Mat4
-    , identity, invert, lookAt, mul, scale, translate
+    , identity, invert, mul, transpose
+    , rotate, scale, translate
+    , transformPoint, transformVector, transform
+    , lookAt, orthographic, perspective
     )
 
-{-| Mat4
+{-|
 
 @docs Mat4
+
+
+# Operations
+
+@docs identity, invert, mul, transpose
+
+
+# Create Transformations (3D)
+
+@docs rotate, scale, translate
+
+
+# Apply matrices
+
+@docs transformPoint, transformVector, transform
+
+
+# Projections
+
+@docs lookAt, orthographic, perspective
 
 -}
 
@@ -50,6 +73,17 @@ identity =
         (vec4 0 0 0 1)
 
 
+{-| -}
+transpose : Mat4 -> Mat4
+transpose { m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44 } =
+    fromRows
+        (vec4 m11 m21 m31 m41)
+        (vec4 m12 m22 m32 m42)
+        (vec4 m13 m23 m33 m43)
+        (vec4 m14 m24 m34 m44)
+
+
+{-| -}
 invert : Mat4 -> Maybe Mat4
 invert m =
     let
@@ -131,6 +165,7 @@ invert m =
             }
 
 
+{-| -}
 mul : Mat4 -> Mat4 -> Mat4
 mul a b =
     { m11 = a.m11 * b.m11 + a.m12 * b.m21 + a.m13 * b.m31 + a.m14 * b.m41
@@ -152,6 +187,7 @@ mul a b =
     }
 
 
+{-| -}
 translate : Vec3 -> Mat4
 translate { x, y, z } =
     fromRows
@@ -161,6 +197,7 @@ translate { x, y, z } =
         (vec4 0 0 0 1)
 
 
+{-| -}
 scale : Vec3 -> Mat4
 scale { x, y, z } =
     fromRows
@@ -170,10 +207,48 @@ scale { x, y, z } =
         (vec4 0 0 0 1)
 
 
+{-| Creates a transformation matrix for rotation in radians about the
+3-element vector axis.
+-}
+rotate : Float -> Vec3 -> Mat4
+rotate angle axis =
+    let
+        { x, y, z } =
+            Vec3.normalize axis
+
+        c =
+            cos angle
+
+        c1 =
+            1 - c
+
+        s =
+            sin angle
+    in
+    { m11 = x * x * c1 + c
+    , m21 = y * x * c1 + z * s
+    , m31 = z * x * c1 - y * s
+    , m41 = 0
+    , m12 = x * y * c1 - z * s
+    , m22 = y * y * c1 + c
+    , m32 = y * z * c1 + x * s
+    , m42 = 0
+    , m13 = x * z * c1 + y * s
+    , m23 = y * z * c1 - x * s
+    , m33 = z * z * c1 + c
+    , m43 = 0
+    , m14 = 0
+    , m24 = 0
+    , m34 = 0
+    , m44 = 1
+    }
+
+
 
 ---- Projections ----
 
 
+{-| -}
 lookAt : { eye : Vec3, centerOfAttention : Vec3, up : Vec3 } -> Maybe Mat4
 lookAt { eye, centerOfAttention, up } =
     let
@@ -226,6 +301,87 @@ lookAt { eye, centerOfAttention, up } =
 
     else
         Nothing
+
+
+{-| -}
+perspective : { fovy : Float, aspect : Float, zNear : Float, zFar : Float } -> Mat4
+perspective { fovy, aspect, zNear, zFar } =
+    let
+        top =
+            zNear * tan (fovy * pi / 360.0)
+
+        bottom =
+            -top
+
+        left =
+            bottom * aspect
+
+        right =
+            top * aspect
+    in
+    { m11 = 2 * zNear / (right - left)
+    , m21 = 0
+    , m31 = 0
+    , m41 = 0
+    , m12 = 0
+    , m22 = 2 * zNear / (top - bottom)
+    , m32 = 0
+    , m42 = 0
+    , m13 = (right + left) / (right - left)
+    , m23 = (top + bottom) / (top - bottom)
+    , m33 = -(zFar + zNear) / (zFar - zNear)
+    , m43 = -1
+    , m14 = 0
+    , m24 = 0
+    , m34 = -2 * zFar * zNear / (zFar - zNear)
+    , m44 = 0
+    }
+
+
+{-| -}
+orthographic : { left : Float, right : Float, bottom : Float, top : Float, zNear : Float, zFar : Float } -> Mat4
+orthographic { left, right, bottom, top, zNear, zFar } =
+    { m11 = 2 / (right - left)
+    , m21 = 0
+    , m31 = 0
+    , m41 = 0
+    , m12 = 0
+    , m22 = 2 / (top - bottom)
+    , m32 = 0
+    , m42 = 0
+    , m13 = 0
+    , m23 = 0
+    , m33 = -2 / (zFar - zNear)
+    , m43 = 0
+    , m14 = -(right + left) / (right - left)
+    , m24 = -(top + bottom) / (top - bottom)
+    , m34 = -(zFar + zNear) / (zFar - zNear)
+    , m44 = 1
+    }
+
+
+{-| -}
+transformPoint : Mat4 -> Vec3 -> Vec3
+transformPoint m v =
+    transform m (Vec3.point v)
+        |> Vec3.fromHomogeneous
+
+
+{-| -}
+transformVector : Mat4 -> Vec3 -> Vec3
+transformVector m v =
+    transform m (Vec3.vector v)
+        |> Vec3.fromHomogeneous
+
+
+{-| -}
+transform : Mat4 -> Vec4 -> Vec4
+transform { m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44 } { x, y, z, w } =
+    vec4
+        (m11 * x + m12 * y + m13 * z + m14 * w)
+        (m21 * x + m22 * y + m23 * z + m24 * w)
+        (m31 * x + m32 * y + m33 * z + m34 * w)
+        (m41 * x + m42 * y + m43 * z + m44 * w)
 
 
 

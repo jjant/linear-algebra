@@ -6,6 +6,7 @@ import Mat4 exposing (Mat4)
 import Math.Matrix4 as Math
 import Math.Vector3 as MathVec3
 import Test exposing (Test, describe, fuzz, fuzz2, fuzz3, test)
+import Util exposing (comparePrecision)
 import Vec3Tests exposing (vec3Fuzzer)
 
 
@@ -17,7 +18,7 @@ suite =
                 compare Mat4.identity (Math.toRecord Math.identity)
         , fuzz mat4Fuzzer "invert" <|
             \r ->
-                compareMaybes compare
+                Util.compareMaybes compare
                     (r |> Mat4.invert)
                     (Math.fromRecord r |> Math.inverse |> Maybe.map Math.toRecord)
 
@@ -149,12 +150,7 @@ suite =
         --             (Math.translate3 f1 f2 f3 (Math.fromRecord r) |> Math.toRecord)
         -- , fuzz2 Fuzz.float vec3Fuzzer "makeRotate" <|
         --     \f v ->
-        --         Expect.all
-        --             [ compare (Mat4.makeRotate f v.adt |> Mat4.toRecord)
-        --             , compare (Record.makeRotate f v.mat4Fuzzer |> Record.toRecord)
-        --             , compare (Tuple.makeRotate f v.tuple |> Tuple.toRecord)
-        --             ]
-        --             (Math.makeRotate f v.math |> Math.toRecord)
+        --         compare (Mat4.rotate f v) (Math.makeRotate f (MathVec3.fromRecord v) |> Math.toRecord)
         , fuzz vec3Fuzzer "makeScale" <|
             \v ->
                 compare (Mat4.scale v)
@@ -165,33 +161,12 @@ suite =
         ]
 
 
-compareMaybes : (a -> b -> Expectation) -> Maybe a -> Maybe b -> Expectation
-compareMaybes f ma mb =
-    case ( ma, mb ) of
-        ( Just a, Just b ) ->
-            f a b
-
-        ( Nothing, Nothing ) ->
-            Expect.pass
-
-        _ ->
-            Expect.fail "Differing maybes"
-
-
 compare : Mat4 -> Mat4 -> Expectation
 compare mat1 mat2 =
     compareCustom 0.000001 mat1 mat2
 
 
-comparePrecision : Float -> Float -> Float -> Expectation
-comparePrecision precision a b =
-    if isNaN a && isNaN b then
-        Expect.pass
-
-    else
-        Expect.within (Absolute precision) a b
-
-
+errorMessage : String -> Float -> Float -> String
 errorMessage str f1 f2 =
     str ++ ":\n" ++ "\tMat1: " ++ String.fromFloat f1 ++ "\n\tMat2: " ++ String.fromFloat f2
 
@@ -199,24 +174,24 @@ errorMessage str f1 f2 =
 compareCustom : Float -> Mat4 -> Mat4 -> Expectation
 compareCustom precision mat1 mat2 =
     Expect.all
-        [ .m11 >> comparePrecision precision mat1.m11 >> Expect.onFail (errorMessage "m11" mat1.m11 mat2.m11)
-        , .m21 >> comparePrecision precision mat1.m21 >> Expect.onFail (errorMessage "m21" mat1.m21 mat2.m21)
-        , .m31 >> comparePrecision precision mat1.m31 >> Expect.onFail (errorMessage "m31" mat1.m31 mat2.m31)
-        , .m41 >> comparePrecision precision mat1.m41 >> Expect.onFail (errorMessage "m41" mat1.m41 mat2.m41)
-        , .m12 >> comparePrecision precision mat1.m12 >> Expect.onFail (errorMessage "m12" mat1.m12 mat2.m12)
-        , .m22 >> comparePrecision precision mat1.m22 >> Expect.onFail (errorMessage "m22" mat1.m22 mat2.m22)
-        , .m32 >> comparePrecision precision mat1.m32 >> Expect.onFail (errorMessage "m32" mat1.m32 mat2.m32)
-        , .m42 >> comparePrecision precision mat1.m42 >> Expect.onFail (errorMessage "m42" mat1.m42 mat2.m42)
-        , .m13 >> comparePrecision precision mat1.m13 >> Expect.onFail (errorMessage "m13" mat1.m13 mat2.m13)
-        , .m23 >> comparePrecision precision mat1.m23 >> Expect.onFail (errorMessage "m23" mat1.m23 mat2.m23)
-        , .m33 >> comparePrecision precision mat1.m33 >> Expect.onFail (errorMessage "m33" mat1.m33 mat2.m33)
-        , .m43 >> comparePrecision precision mat1.m43 >> Expect.onFail (errorMessage "m43" mat1.m43 mat2.m43)
-        , .m14 >> comparePrecision precision mat1.m14 >> Expect.onFail (errorMessage "m14" mat1.m14 mat2.m14)
-        , .m24 >> comparePrecision precision mat1.m24 >> Expect.onFail (errorMessage "m24" mat1.m24 mat2.m24)
-        , .m34 >> comparePrecision precision mat1.m34 >> Expect.onFail (errorMessage "m34" mat1.m34 mat2.m34)
-        , .m44 >> comparePrecision precision mat1.m44 >> Expect.onFail (errorMessage "m44" mat1.m44 mat2.m44)
+        [ \_ -> comparePrecision precision mat1.m11 mat2.m11 |> Expect.onFail (errorMessage "m11" mat1.m11 mat2.m11)
+        , \_ -> comparePrecision precision mat1.m21 mat2.m21 |> Expect.onFail (errorMessage "m21" mat1.m21 mat2.m21)
+        , \_ -> comparePrecision precision mat1.m31 mat2.m31 |> Expect.onFail (errorMessage "m31" mat1.m31 mat2.m31)
+        , \_ -> comparePrecision precision mat1.m41 mat2.m41 |> Expect.onFail (errorMessage "m41" mat1.m41 mat2.m41)
+        , \_ -> comparePrecision precision mat1.m12 mat2.m12 |> Expect.onFail (errorMessage "m12" mat1.m12 mat2.m12)
+        , \_ -> comparePrecision precision mat1.m22 mat2.m22 |> Expect.onFail (errorMessage "m22" mat1.m22 mat2.m22)
+        , \_ -> comparePrecision precision mat1.m32 mat2.m32 |> Expect.onFail (errorMessage "m32" mat1.m32 mat2.m32)
+        , \_ -> comparePrecision precision mat1.m42 mat2.m42 |> Expect.onFail (errorMessage "m42" mat1.m42 mat2.m42)
+        , \_ -> comparePrecision precision mat1.m13 mat2.m13 |> Expect.onFail (errorMessage "m13" mat1.m13 mat2.m13)
+        , \_ -> comparePrecision precision mat1.m23 mat2.m23 |> Expect.onFail (errorMessage "m23" mat1.m23 mat2.m23)
+        , \_ -> comparePrecision precision mat1.m33 mat2.m33 |> Expect.onFail (errorMessage "m33" mat1.m33 mat2.m33)
+        , \_ -> comparePrecision precision mat1.m43 mat2.m43 |> Expect.onFail (errorMessage "m43" mat1.m43 mat2.m43)
+        , \_ -> comparePrecision precision mat1.m14 mat2.m14 |> Expect.onFail (errorMessage "m14" mat1.m14 mat2.m14)
+        , \_ -> comparePrecision precision mat1.m24 mat2.m24 |> Expect.onFail (errorMessage "m24" mat1.m24 mat2.m24)
+        , \_ -> comparePrecision precision mat1.m34 mat2.m34 |> Expect.onFail (errorMessage "m34" mat1.m34 mat2.m34)
+        , \_ -> comparePrecision precision mat1.m44 mat2.m44 |> Expect.onFail (errorMessage "m44" mat1.m44 mat2.m44)
         ]
-        mat2
+        ()
 
 
 compareVec3 : { x : Float, y : Float, z : Float } -> { x : Float, y : Float, z : Float } -> Expectation
