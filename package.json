@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "elm-review": "elm-review  --template jfmengels/elm-review-unused/example"
+  },
   "devDependencies": {
     "elm-review": "^2.7.0",
     "elm-test": "^0.19.1-revision7"

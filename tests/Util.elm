@@ -2,7 +2,6 @@ module Util exposing
     ( compareFloat
     , compareMaybes
     , comparePrecision
-    , epsilon
     , ignoreEquals
     , ignoreZero
     )
