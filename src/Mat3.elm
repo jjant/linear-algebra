@@ -1,9 +1,10 @@
 module Mat3 exposing
     ( Mat3
-    , identity, fromRows, rotate, scale, translate
+    , identity, fromRows
     , mul, invert, transpose
-    , transform, transformVector, transformPoint
+    , rotate, scale, translate
     , lookAt, orthographic, viewport
+    , transform, transformVector, transformPoint
     )
 
 {-|
@@ -13,7 +14,7 @@ module Mat3 exposing
 
 # Create
 
-@docs identity, fromRows, rotate, scale, translate
+@docs identity, fromRows
 
 
 # Operations
@@ -21,14 +22,19 @@ module Mat3 exposing
 @docs mul, invert, transpose
 
 
-# Apply matrices
+# 2D Transformations
 
-@docs transform, transformVector, transformPoint
+@docs rotate, scale, translate
 
 
 # Projections
 
 @docs lookAt, orthographic, viewport
+
+
+# Apply matrices
+
+@docs transform, transformVector, transformPoint
 
 -}
 
@@ -65,7 +71,8 @@ identity =
     }
 
 
-{-| -}
+{-| Create a matrix out of vectors representing its rows.
+-}
 fromRows : Vec3 -> Vec3 -> Vec3 -> Mat3
 fromRows row1 row2 row3 =
     { m11 = row1.x

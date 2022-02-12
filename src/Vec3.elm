@@ -1,22 +1,33 @@
 module Vec3 exposing
-    ( Vec3, vec3, zero, i, j, k
+    ( Vec3
+    , vec3
     , setX, setY, setZ
+    , zero, i, j, k
     , add, sub, negate, scale, dot, cross, normalize, direction
     , length, lengthSquared, distance, distanceSquared
     , point, vector, fromHomogeneous
     )
 
-{-| Vec3
+{-|
+
+@docs Vec3
 
 
 # Create
 
-@docs Vec3, vec3, zero, i, j, k
+@docs vec3
 
 
 # Setters
 
+The set functions create a new copy of the vector, updating a single field.
+
 @docs setX, setY, setZ
+
+
+# Constants
+
+@docs zero, i, j, k
 
 
 # Operations
@@ -34,8 +45,7 @@ module Vec3 exposing
 import Vec4 exposing (Vec4)
 
 
-{-| Vec3
--}
+{-| -}
 type alias Vec3 =
     { x : Float
     , y : Float
@@ -43,7 +53,8 @@ type alias Vec3 =
     }
 
 
-{-| -}
+{-| Create a vector out of its x, y, and z components.
+-}
 vec3 : Float -> Float -> Float -> Vec3
 vec3 =
     Vec3

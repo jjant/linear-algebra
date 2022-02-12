@@ -1,6 +1,8 @@
 module Vec4 exposing
-    ( Vec4, vec4, zero
+    ( Vec4
+    , vec4
     , setX, setY, setZ, setW
+    , zero
     , add, sub, negate, scale, dot, normalize, direction
     , length, lengthSquared, distance, distanceSquared
     , toString
@@ -8,17 +10,24 @@ module Vec4 exposing
 
 {-|
 
+@docs Vec4
+
 
 # Create
 
-@docs Vec4, vec4, zero
+@docs vec4
 
 
-# Get and Set
+# Setters
 
 The set functions create a new copy of the vector, updating a single field.
 
 @docs setX, setY, setZ, setW
+
+
+# Constants
+
+@docs zero
 
 
 # Operations
@@ -30,8 +39,7 @@ The set functions create a new copy of the vector, updating a single field.
 -}
 
 
-{-| Vec4
--}
+{-| -}
 type alias Vec4 =
     { x : Float
     , y : Float
@@ -40,7 +48,8 @@ type alias Vec4 =
     }
 
 
-{-| -}
+{-| Create a vector out of its x, y, z, and w components.
+-}
 vec4 : Float -> Float -> Float -> Float -> Vec4
 vec4 =
     Vec4

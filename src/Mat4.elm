@@ -1,9 +1,10 @@
 module Mat4 exposing
     ( Mat4
-    , identity, invert, mul, transpose
+    , identity, fromRows
+    , invert, mul, transpose
     , rotate, scale, translate
-    , transformPoint, transformVector, transform
     , lookAt, orthographic, perspective
+    , transformPoint, transformVector, transform
     )
 
 {-|
@@ -11,24 +12,29 @@ module Mat4 exposing
 @docs Mat4
 
 
+# Create
+
+@docs identity, fromRows
+
+
 # Operations
 
-@docs identity, invert, mul, transpose
+@docs invert, mul, transpose
 
 
-# Create Transformations (3D)
+# 3D Transformations
 
 @docs rotate, scale, translate
-
-
-# Apply matrices
-
-@docs transformPoint, transformVector, transform
 
 
 # Projections
 
 @docs lookAt, orthographic, perspective
+
+
+# Apply matrices
+
+@docs transformPoint, transformVector, transform
 
 -}
 
@@ -57,6 +63,8 @@ type alias Mat4 =
     }
 
 
+{-| Create a matrix out of vectors representing its rows.
+-}
 fromRows : Vec4 -> Vec4 -> Vec4 -> Vec4 -> Mat4
 fromRows v1 v2 v3 v4 =
     Mat4 v1.x v1.y v1.z v1.w v2.x v2.y v2.z v2.w v3.x v3.y v3.z v3.w v4.x v4.y v4.z v4.w

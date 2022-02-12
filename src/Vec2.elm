@@ -24,6 +24,8 @@ module Vec2 exposing
 
 # Setters
 
+The set functions create a new copy of the vector, updating a single field.
+
 @docs setX, setY
 
 
@@ -78,7 +80,7 @@ setY y { x } =
     }
 
 
-{-| Create a vector out of its x and y coordinates.
+{-| Create a vector out of its x and y components.
 -}
 vec2 : Float -> Float -> Vec2
 vec2 =

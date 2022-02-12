@@ -1,7 +1,8 @@
 module Mat2 exposing
     ( Mat2
-    , identity, fromRows, rotate, scale
-    , mul, invert, transpose, det, add
+    , identity, fromRows
+    , add, mul, invert, transpose, det
+    , rotate, scale
     , transform
     )
 
@@ -12,12 +13,17 @@ module Mat2 exposing
 
 # Create
 
-@docs identity, fromRows, rotate, scale
+@docs identity, fromRows
 
 
 # Operations
 
-@docs mul, invert, transpose, det, add
+@docs add, mul, invert, transpose, det
+
+
+# Transformations
+
+@docs rotate, scale
 
 
 # Apply matrices
@@ -76,9 +82,6 @@ identity =
 
 
 {-| Create a matrix out of vectors representing its rows.
-
-You probably won't need this too often.
-
 -}
 fromRows : Vec2 -> Vec2 -> Mat2
 fromRows row1 row2 =
