@@ -7,7 +7,9 @@ import Math.Matrix4 as Math
 import Math.Vector3 as MathVec3
 import Test exposing (Test, describe, fuzz, fuzz2, fuzz3, test)
 import Util exposing (comparePrecision)
+import Vec3 exposing (Vec3, vec3)
 import Vec3Tests exposing (vec3Fuzzer)
+import Vec4 exposing (vec4)
 
 
 suite : Test
@@ -21,6 +23,15 @@ suite =
                 Util.compareMaybes compare
                     (r |> Mat4.invert)
                     (Math.fromRecord r |> Math.inverse |> Maybe.map Math.toRecord)
+        , test "cannot invert a singular matrix" <|
+            \_ ->
+                Mat4.fromRows
+                    (vec4 1 1 2 3)
+                    (vec4 1 1 12 6)
+                    (vec4 1 1 -1 23)
+                    (vec4 0 0 0 0)
+                    |> Mat4.invert
+                    |> Expect.equal Nothing
 
         -- , fuzz mat4Fuzzer "inverseOrthonormal" <|
         --     \r ->
@@ -99,6 +110,18 @@ suite =
         --             , compare (Tuple.makeOrtho2D f1 f2 f3 f4 |> Tuple.toRecord)
         --             ]
         --             (Math.makeOrtho2D f1 f2 f3 f4 |> Math.toRecord)
+        , test "lookAt when eye equals centerOfAttention" <|
+            \_ ->
+                let
+                    eye =
+                        vec3 0 0 1
+                in
+                Mat4.lookAt
+                    { eye = eye
+                    , centerOfAttention = eye
+                    , up = Vec3.j
+                    }
+                    |> Expect.equal Nothing
         , fuzz3 vec3Fuzzer vec3Fuzzer vec3Fuzzer "makeLookAt" <|
             \eye centerOfAttention up ->
                 Mat4.lookAt { eye = eye, centerOfAttention = centerOfAttention, up = up }

@@ -18,12 +18,21 @@ suite =
         , fuzzWrap2 "distance" Math.distance Vec4.distance
         , fuzzWrap2 "distanceSquared" Math.distanceSquared Vec4.distanceSquared
         , fuzzWrap2 "dot" Math.dot Vec4.dot
+        , test "0 has length 0" <|
+            \_ ->
+                Vec4.zero
+                    |> Vec4.length
+                    |> Expect.equal 0
         , fuzzWrap "length" Math.length Vec4.length
         , fuzzWrap "lengthSquared" Math.lengthSquared Vec4.lengthSquared
         , fuzzWrap2Vec "add" Math.add Vec4.add
         , fuzzWrap2Vec "sub" Math.sub Vec4.sub
         , fuzzWrap2Vec "direction" (Util.ignoreEquals (Math.vec4 0 0 0 0) Math.direction) (\a b -> Vec4.direction { from = b, to = a })
         , fuzzWrapVec "negate" Math.negate Vec4.negate
+        , test "normalize 0 is 0" <|
+            \_ ->
+                Vec4.normalize Vec4.zero
+                    |> Expect.equal Vec4.zero
         , fuzzWrapVec "normalize" (Util.ignoreZero (Math.vec4 0 0 0 0) Math.normalize) Vec4.normalize
         , fuzzWrapFloatVec "scale" Math.scale Vec4.scale
         ]

@@ -50,6 +50,18 @@ suite =
             \_ ->
                 Vec3.k
                     |> Expect.equal (vec3 0 0 1)
+        , fuzz vec3Fuzzer "fromHomogeneous is inverse of point" <|
+            \v ->
+                v
+                    |> Vec3.point
+                    |> Vec3.fromHomogeneous
+                    |> compareVec3 v
+        , fuzz vec3Fuzzer "fromHomogeneous is inverse of vector" <|
+            \v ->
+                v
+                    |> Vec3.vector
+                    |> Vec3.fromHomogeneous
+                    |> compareVec3 v
         ]
 
 

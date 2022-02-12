@@ -2,8 +2,9 @@ module Mat3Tests exposing (all)
 
 import Expect exposing (Expectation, FloatingPointTolerance(..))
 import Fuzz exposing (Fuzzer)
-import Mat3
-import Test exposing (Test, describe, test)
+import Mat3 exposing (Mat3)
+import Test exposing (Test, describe, fuzz, test)
+import Util exposing (comparePrecision)
 import Vec2 exposing (Vec2, vec2)
 import Vec2Tests
 import Vec3 exposing (vec3)
@@ -72,12 +73,42 @@ all =
                                 (vec3 1 4 0)
                             )
             ]
+        , addTests
         , mulTests
         , invertTests
         , lookAtTests
+        , orthographicTests
         , viewportTests
         , transformPointTests
         , transformVectorTests
+        ]
+
+
+addTests : Test
+addTests =
+    describe "Mat3.add"
+        [ fuzz mat3Fuzzer "0 + m == m" <|
+            \m ->
+                let
+                    zero =
+                        Mat3.fromRows
+                            (vec3 0 0 0)
+                            (vec3 0 0 0)
+                            (vec3 0 0 0)
+                in
+                Mat3.add m zero
+                    |> Expect.equal m
+        , test "adding known matrices" <|
+            \_ ->
+                Mat3.add
+                    (Mat3.fromRows (vec3 1 2 3) (vec3 3 4 5) (vec3 -1 -2 -3))
+                    (Mat3.fromRows (vec3 5 -1 -10) (vec3 28 0.1 0) (vec3 0 0 0))
+                    |> compare
+                        (Mat3.fromRows
+                            (vec3 6 1 -7)
+                            (vec3 31 4.1 5)
+                            (vec3 -1 -2 -3)
+                        )
         ]
 
 
@@ -128,6 +159,14 @@ invertTests =
                 Mat3.identity
                     |> Mat3.invert
                     |> Expect.equal (Just Mat3.identity)
+        , test "non-invertible matrix" <|
+            \_ ->
+                Mat3.fromRows
+                    (vec3 1 2 3)
+                    (vec3 4 5 6)
+                    (vec3 0 0 0)
+                    |> Mat3.invert
+                    |> Expect.equal Nothing
         , test "translate" <|
             \_ ->
                 Mat3.translate (vec2 1 0)
@@ -164,6 +203,38 @@ lookAtTests =
                     )
                     (vec2 6 5)
                     |> Expect.equal (vec2 1 0)
+        ]
+
+
+orthographicTests : Test
+orthographicTests =
+    describe "Mat3.orthographic"
+        [ test "translate point on right edge to +1" <|
+            \_ ->
+                let
+                    width =
+                        500
+
+                    height =
+                        200
+                in
+                vec2 (width / 2) 37
+                    |> Mat3.transformPoint (Mat3.orthographic { width = width, height = height })
+                    |> .x
+                    |> Util.compareFloat 1
+        , test "translate point on left edge to -1" <|
+            \_ ->
+                let
+                    width =
+                        500
+
+                    height =
+                        200
+                in
+                vec2 -(width / 2) 37
+                    |> Mat3.transformPoint (Mat3.orthographic { width = width, height = height })
+                    |> .x
+                    |> Util.compareFloat -1
         ]
 
 
@@ -295,3 +366,38 @@ vectorFuzzer =
 fmodBy : Float -> Float -> Float
 fmodBy mod value =
     value - mod * toFloat (floor (value / mod))
+
+
+compare : Mat3 -> Mat3 -> Expectation
+compare =
+    compareCustom 0.000001
+
+
+compareCustom : Float -> Mat3 -> Mat3 -> Expectation
+compareCustom fp a b =
+    Expect.all
+        [ \_ -> comparePrecision fp a.m11 b.m11
+        , \_ -> comparePrecision fp a.m12 b.m12
+        , \_ -> comparePrecision fp a.m13 b.m13
+        , \_ -> comparePrecision fp a.m21 b.m21
+        , \_ -> comparePrecision fp a.m22 b.m22
+        , \_ -> comparePrecision fp a.m23 b.m23
+        , \_ -> comparePrecision fp a.m31 b.m31
+        , \_ -> comparePrecision fp a.m32 b.m32
+        , \_ -> comparePrecision fp a.m33 b.m33
+        ]
+        ()
+
+
+mat3Fuzzer : Fuzz.Fuzzer Mat3
+mat3Fuzzer =
+    Fuzz.constant Mat3
+        |> Fuzz.andMap Fuzz.float
+        |> Fuzz.andMap Fuzz.float
+        |> Fuzz.andMap Fuzz.float
+        |> Fuzz.andMap Fuzz.float
+        |> Fuzz.andMap Fuzz.float
+        |> Fuzz.andMap Fuzz.float
+        |> Fuzz.andMap Fuzz.float
+        |> Fuzz.andMap Fuzz.float
+        |> Fuzz.andMap Fuzz.float
