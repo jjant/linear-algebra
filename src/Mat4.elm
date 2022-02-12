@@ -1,9 +1,10 @@
 module Mat4 exposing
     ( Mat4
-    , identity, invert, mul, transpose
+    , identity, fromRows
+    , add, mul, invert, transpose
     , rotate, scale, translate
-    , transformPoint, transformVector, transform
     , lookAt, orthographic, perspective
+    , transformPoint, transformVector, transform
     )
 
 {-|
@@ -11,24 +12,29 @@ module Mat4 exposing
 @docs Mat4
 
 
+# Create
+
+@docs identity, fromRows
+
+
 # Operations
 
-@docs identity, invert, mul, transpose
+@docs add, mul, invert, transpose
 
 
-# Create Transformations (3D)
+# 3D Transformations
 
 @docs rotate, scale, translate
-
-
-# Apply matrices
-
-@docs transformPoint, transformVector, transform
 
 
 # Projections
 
 @docs lookAt, orthographic, perspective
+
+
+# Apply matrices
+
+@docs transformPoint, transformVector, transform
 
 -}
 
@@ -36,8 +42,7 @@ import Vec3 exposing (Vec3)
 import Vec4 exposing (Vec4, vec4)
 
 
-{-| Mat4
--}
+{-| -}
 type alias Mat4 =
     { m11 : Float
     , m12 : Float
@@ -58,6 +63,8 @@ type alias Mat4 =
     }
 
 
+{-| Create a matrix out of vectors representing its rows.
+-}
 fromRows : Vec4 -> Vec4 -> Vec4 -> Vec4 -> Mat4
 fromRows v1 v2 v3 v4 =
     Mat4 v1.x v1.y v1.z v1.w v2.x v2.y v2.z v2.w v3.x v3.y v3.z v3.w v4.x v4.y v4.z v4.w
@@ -163,6 +170,28 @@ invert m =
             , m34 = r34 * idet
             , m44 = r44 * idet
             }
+
+
+{-| -}
+add : Mat4 -> Mat4 -> Mat4
+add a b =
+    { m11 = a.m11 + b.m11
+    , m21 = a.m21 + b.m21
+    , m31 = a.m31 + b.m31
+    , m41 = a.m41 + b.m41
+    , m12 = a.m12 + b.m12
+    , m22 = a.m22 + b.m22
+    , m32 = a.m32 + b.m32
+    , m42 = a.m42 + b.m42
+    , m13 = a.m13 + b.m13
+    , m23 = a.m23 + b.m23
+    , m33 = a.m33 + b.m33
+    , m43 = a.m43 + b.m43
+    , m14 = a.m14 + b.m14
+    , m24 = a.m24 + b.m24
+    , m34 = a.m34 + b.m34
+    , m44 = a.m44 + b.m44
+    }
 
 
 {-| -}

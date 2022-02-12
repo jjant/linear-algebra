@@ -1,25 +1,30 @@
 module Vec2 exposing
-    ( Vec2, vec2
+    ( Vec2
+    , vec2
     , setX, setY
     , zero, up, down, left, right
     , add, sub, negate, scale, dot, normalize, direction, midpoint
     , lerp, angle
-    , scaleX, scaleY, rotateCCW
+    , scaleX, scaleY, rotate
     , length, lengthSquared, distance, distanceSquared
     , cross
-    , fromHomogeneous
     , toString
+    , point, vector, fromHomogeneous
     )
 
-{-| 2D Vectors for math.
+{-|
+
+@docs Vec2
 
 
 # Create
 
-@docs Vec2, vec2
+@docs vec2
 
 
 # Setters
+
+The set functions create a new copy of the vector, updating a single field.
 
 @docs setX, setY
 
@@ -33,15 +38,15 @@ module Vec2 exposing
 
 @docs add, sub, negate, scale, dot, normalize, direction, midpoint
 @docs lerp, angle
-@docs scaleX, scaleY, rotateCCW
+@docs scaleX, scaleY, rotate
 @docs length, lengthSquared, distance, distanceSquared
 @docs cross
-
-
-# Conversions
-
-@docs fromHomogeneous
 @docs toString
+
+
+# Homogeneous coordinates
+
+@docs point, vector, fromHomogeneous
 
 -}
 
@@ -75,7 +80,7 @@ setY y { x } =
     }
 
 
-{-| Create a vector out of its x and y coordinates.
+{-| Create a vector out of its x and y components.
 -}
 vec2 : Float -> Float -> Vec2
 vec2 =
@@ -90,11 +95,12 @@ add v1 v2 =
     }
 
 
-{-| sub v1 v2 computes v1 - v2.
+{-| `sub v1 v2` computes v1 - v2.
+
 Can be easily confused in pipelines like
 
     v2
-        |> sub v1
+        |> sub v1 -- this is actually v1 - v2
 
 I think both alternatives are confusing, so I chose this one rather arbitrarily.
 
@@ -126,16 +132,20 @@ distanceSquared v1 v2 =
     lengthSquared (sub v1 v2)
 
 
-{-| Computes |v| for a vector v.
+{-| Computes `|v|` for a vector `v`.
+
 If you need the square of this value, use Vec2.lengthSquared for efficiency.
+
 -}
 length : Vec2 -> Float
 length vec =
     Basics.sqrt (lengthSquared vec)
 
 
-{-| Computes |v|^2 for a vector v.
+{-| Computes `|v|^2` for a vector `v`.
+
 Faster than `length` because it saves a square root operation.
+
 -}
 lengthSquared : Vec2 -> Float
 lengthSquared { x, y } =
@@ -164,7 +174,7 @@ normalize vec =
         vec
 
 
-{-| Computes -v given a vector `v`.
+{-| Given `v`, computes `-v`.
 -}
 negate : Vec2 -> Vec2
 negate { x, y } =
@@ -175,8 +185,8 @@ negate { x, y } =
 
 {-| Rotates a given vector by an angle in radians, in counterclockwise fashion.
 -}
-rotateCCW : Float -> Vec2 -> Vec2
-rotateCCW angleRadians { x, y } =
+rotate : Float -> Vec2 -> Vec2
+rotate angleRadians { x, y } =
     let
         co =
             Basics.cos angleRadians
@@ -188,7 +198,7 @@ rotateCCW angleRadians { x, y } =
 
 
 {-| Returns the z-coordinate of the cross product when interpreting the 2d vectors as
-3d vectors of the shape (v.x, v.y, 0).
+3d vectors of the shape `vec3 v.x v.y 0`.
 
     cross v1 v2 == (( v1.x, v1.y, 0 ) x ( v2.x, v2.y, 0 )).z
 
@@ -200,7 +210,7 @@ cross v1 v2 =
     v1.x * v2.y - v1.y * v2.x
 
 
-{-| Mostly for debugging purposes.
+{-| Convenient for debugging purposes.
 -}
 toString : Vec2 -> String
 toString { x, y } =
@@ -270,35 +280,31 @@ zero =
     vec2 0 0
 
 
-{-| Standard "up" vector, vec2 0 1.
--}
+{-| -}
 up : Vec2
 up =
     vec2 0 1
 
 
-{-| Standard "down" vector, vec2 0 -1.
--}
+{-| -}
 down : Vec2
 down =
     vec2 0 -1
 
 
-{-| Standard "right" vector, vec2 1 0.
--}
+{-| -}
 right : Vec2
 right =
     vec2 1 0
 
 
-{-| Standard "left" vector, vec2 -1 0.
--}
+{-| -}
 left : Vec2
 left =
     vec2 -1 0
 
 
-{-| Conversions
+{-| Homogeneous coordinates
 -}
 fromHomogeneous : Vec3 -> Vec2
 fromHomogeneous v3 =
@@ -308,3 +314,15 @@ fromHomogeneous v3 =
 
     else
         vec2 v3.x v3.y
+
+
+{-| -}
+point : Vec2 -> Vec3
+point { x, y } =
+    { x = x, y = y, z = 1 }
+
+
+{-| -}
+vector : Vec2 -> Vec3
+vector { x, y } =
+    { x = x, y = y, z = 0 }

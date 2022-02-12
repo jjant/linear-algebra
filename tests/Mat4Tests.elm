@@ -7,7 +7,9 @@ import Math.Matrix4 as Math
 import Math.Vector3 as MathVec3
 import Test exposing (Test, describe, fuzz, fuzz2, fuzz3, test)
 import Util exposing (comparePrecision)
+import Vec3 exposing (Vec3, vec3)
 import Vec3Tests exposing (vec3Fuzzer)
+import Vec4 exposing (vec4)
 
 
 suite : Test
@@ -21,6 +23,15 @@ suite =
                 Util.compareMaybes compare
                     (r |> Mat4.invert)
                     (Math.fromRecord r |> Math.inverse |> Maybe.map Math.toRecord)
+        , test "cannot invert a singular matrix" <|
+            \_ ->
+                Mat4.fromRows
+                    (vec4 1 1 2 3)
+                    (vec4 1 1 12 6)
+                    (vec4 1 1 -1 23)
+                    (vec4 0 0 0 0)
+                    |> Mat4.invert
+                    |> Expect.equal Nothing
 
         -- , fuzz mat4Fuzzer "inverseOrthonormal" <|
         --     \r ->
@@ -43,14 +54,11 @@ suite =
         --             , compare (Tuple.mulAffine (Tuple.fromRecord r1) (Tuple.fromRecord r2) |> Tuple.toRecord)
         --             ]
         --             (Math.mulAffine (Math.fromRecord r1) (Math.fromRecord r2) |> Math.toRecord)
-        -- , fuzz mat4Fuzzer "transpose" <|
-        --     \r ->
-        --         Expect.all
-        --             [ compare (r |> Mat4.transpose |> Mat4.toRecord)
-        --             , compare (r |> Record.fromRecord |> Record.transpose |> Record.toRecord)
-        --             , compare (r |> Tuple.fromRecord |> Tuple.transpose |> Tuple.toRecord)
-        --             ]
-        --             (r |> Math.fromRecord |> Math.transpose |> Math.toRecord)
+        , fuzz mat4Fuzzer "transpose" <|
+            \r ->
+                compare (r |> Mat4.transpose)
+                    (r |> Math.fromRecord |> Math.transpose |> Math.toRecord)
+
         -- , fuzz3 vec3Fuzzer vec3Fuzzer vec3Fuzzer "makeBasis" <|
         --     \v1 v2 v3 ->
         --         Expect.all
@@ -59,14 +67,11 @@ suite =
         --             , compare (Tuple.makeBasis v1.tuple v2.tuple v3.tuple |> Tuple.toRecord)
         --             ]
         --             (Math.makeBasis v1.math v2.math v3.math |> Math.toRecord)
-        -- , fuzz2 mat4Fuzzer vec3Fuzzer "transform" <|
-        --     \r1 v2 ->
-        --         Expect.all
-        --             [ compareVec3 (Mat4.transform (Mat4.fromRecord r1) v2.adt |> ADTVec3.toRecord)
-        --             , compareVec3 (Record.transform (Record.fromRecord r1) v2.mat4Fuzzer |> RecordVec3.toRecord)
-        --             , compareVec3 (Tuple.transform (Tuple.fromRecord r1) v2.tuple |> TupleVec3.toRecord)
-        --             ]
-        --             (Math.transform (Math.fromRecord r1) v2.math |> MathVec3.toRecord)
+        , fuzz2 mat4Fuzzer vec3Fuzzer "transform" <|
+            \r1 v2 ->
+                compareVec3 (Mat4.transformPoint r1 v2)
+                    (Math.transform (Math.fromRecord r1) (MathVec3.fromRecord v2) |> MathVec3.toRecord)
+
         -- , fuzz6 Fuzz.float positive Fuzz.float positive Fuzz.float positive "makeFrustum" <|
         --     \f1 f2 f3 f4 f5 f6 ->
         --         Expect.all
@@ -75,14 +80,11 @@ suite =
         --             , compare (Tuple.makeFrustum f1 f2 f3 f4 f5 f6 |> Tuple.toRecord)
         --             ]
         --             (Math.makeFrustum f1 f2 f3 f4 f5 f6 |> Math.toRecord)
-        -- , fuzz4 positive positive positive positive "makePerspective" <|
-        --     \f1 f2 f3 f4 ->
-        --         Expect.all
-        --             [ compare (Mat4.makePerspective f1 f2 f3 f4 |> Mat4.toRecord)
-        --             , compare (Record.makePerspective f1 f2 f3 f4 |> Record.toRecord)
-        --             , compare (Tuple.makePerspective f1 f2 f3 f4 |> Tuple.toRecord)
-        --             ]
-        --             (Math.makePerspective f1 f2 f3 f4 |> Math.toRecord)
+        , fuzz4 positive positive positive positive "makePerspective" <|
+            \f1 f2 f3 f4 ->
+                compare (Mat4.perspective { fovy = f1, aspect = f2, zNear = f3, zFar = f4 })
+                    (Math.makePerspective f1 f2 f3 f4 |> Math.toRecord)
+
         -- , fuzz6 Fuzz.float positive Fuzz.float positive Fuzz.float positive "makeOrtho" <|
         --     \f1 f2 f3 f4 f5 f6 ->
         --         Expect.all
@@ -99,6 +101,18 @@ suite =
         --             , compare (Tuple.makeOrtho2D f1 f2 f3 f4 |> Tuple.toRecord)
         --             ]
         --             (Math.makeOrtho2D f1 f2 f3 f4 |> Math.toRecord)
+        , test "lookAt when eye equals centerOfAttention" <|
+            \_ ->
+                let
+                    eye =
+                        vec3 0 0 1
+                in
+                Mat4.lookAt
+                    { eye = eye
+                    , centerOfAttention = eye
+                    , up = Vec3.j
+                    }
+                    |> Expect.equal Nothing
         , fuzz3 vec3Fuzzer vec3Fuzzer vec3Fuzzer "makeLookAt" <|
             \eye centerOfAttention up ->
                 Mat4.lookAt { eye = eye, centerOfAttention = centerOfAttention, up = up }
@@ -118,20 +132,8 @@ suite =
         --             (Math.rotate f v.math (Math.fromRecord r) |> Math.toRecord)
         -- , fuzz2 vec3Fuzzer mat4Fuzzer "scale" <|
         --     \v r ->
-        --         Expect.all
-        --             [ compare (Mat4.scale v.adt (Mat4.fromRecord r) |> Mat4.toRecord)
-        --             , compare (Record.scale v.mat4Fuzzer (Record.fromRecord r) |> Record.toRecord)
-        --             , compare (Tuple.scale v.tuple (Tuple.fromRecord r) |> Tuple.toRecord)
-        --             ]
-        --             (Math.scale v.math (Math.fromRecord r) |> Math.toRecord)
-        -- , fuzz4 Fuzz.float Fuzz.float Fuzz.float mat4Fuzzer "scale3" <|
-        --     \f1 f2 f3 r ->
-        --         Expect.all
-        --             [ compare (Mat4.scale3 f1 f2 f3 (Mat4.fromRecord r) |> Mat4.toRecord)
-        --             , compare (Record.scale3 f1 f2 f3 (Record.fromRecord r) |> Record.toRecord)
-        --             , compare (Tuple.scale3 f1 f2 f3 (Tuple.fromRecord r) |> Tuple.toRecord)
-        --             ]
-        --             (Math.scale3 f1 f2 f3 (Math.fromRecord r) |> Math.toRecord)
+        --         compare (Mat4.scale v r)
+        --             (Math.scale (MathVec3.fromRecord v) (Math.fromRecord r) |> Math.toRecord)
         -- , fuzz2 vec3Fuzzer mat4Fuzzer "translate" <|
         --     \v r ->
         --         Expect.all
@@ -148,9 +150,9 @@ suite =
         --             , compare (Tuple.translate3 f1 f2 f3 (Tuple.fromRecord r) |> Tuple.toRecord)
         --             ]
         --             (Math.translate3 f1 f2 f3 (Math.fromRecord r) |> Math.toRecord)
-        -- , fuzz2 Fuzz.float vec3Fuzzer "makeRotate" <|
-        --     \f v ->
-        --         compare (Mat4.rotate f v) (Math.makeRotate f (MathVec3.fromRecord v) |> Math.toRecord)
+        , fuzz2 Fuzz.float vec3Fuzzer "makeRotate" <|
+            \f v ->
+                compare (Mat4.rotate f v) (Math.makeRotate f (MathVec3.fromRecord v) |> Math.toRecord)
         , fuzz vec3Fuzzer "makeScale" <|
             \v ->
                 compare (Mat4.scale v)
@@ -194,7 +196,7 @@ compareCustom precision mat1 mat2 =
         ()
 
 
-compareVec3 : { x : Float, y : Float, z : Float } -> { x : Float, y : Float, z : Float } -> Expectation
+compareVec3 : Vec3 -> Vec3 -> Expectation
 compareVec3 vec1 vec2 =
     Expect.all
         [ .x >> Expect.within (Absolute 0.0000000001) vec1.x

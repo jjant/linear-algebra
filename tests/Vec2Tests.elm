@@ -22,6 +22,9 @@ suite =
         , fuzzWrap2Vec "sub" Math.sub Vec2.sub
         , fuzzWrap2Vec "direction" (Util.ignoreEquals (Math.vec2 0 0) Math.direction) (\a b -> Vec2.direction { from = b, to = a })
         , fuzzWrapVec "negate" Math.negate Vec2.negate
+        , test "normalize 0 == 0" <|
+            \_ ->
+                compareVec2 (Vec2.normalize Vec2.zero) Vec2.zero
         , fuzzWrapVec "normalize" (Util.ignoreZero (Math.vec2 0 0) Math.normalize) Vec2.normalize
         , fuzzWrapFloatVec "scale" Math.scale Vec2.scale
         ]

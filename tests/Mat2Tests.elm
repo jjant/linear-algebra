@@ -38,10 +38,13 @@ suite =
                         |> Maybe.withDefault (Expect.fail "Couldn't invert")
             , test "cannot invert a singular matrix" <|
                 \_ ->
-                    Mat2.fromRows (vec2 1 1) (vec2 0 0)
+                    Mat2.fromRows
+                        (vec2 1 1)
+                        (vec2 0 0)
                         |> Mat2.invert
                         |> Expect.equal Nothing
             ]
+        , addTests
         , mulTests
         , transformTests
         , invertTests
@@ -74,6 +77,28 @@ suite =
                         |> Just
                         |> Util.compareMaybes compare (Mat2.invert m)
             ]
+        ]
+
+
+addTests : Test
+addTests =
+    describe "Mat2.add"
+        [ fuzz mat2Fuzzer "0 + m == m" <|
+            \m ->
+                let
+                    zero =
+                        Mat2.fromRows
+                            (vec2 0 0)
+                            (vec2 0 0)
+                in
+                Mat2.add m zero
+                    |> Expect.equal m
+        , test "adding known matrices" <|
+            \_ ->
+                Mat2.add
+                    (Mat2.fromRows (vec2 1 2) (vec2 3 4))
+                    (Mat2.fromRows (vec2 5 -1) (vec2 28 0.1))
+                    |> compare (Mat2.fromRows (vec2 6 1) (vec2 31 4.1))
         ]
 
 
@@ -158,3 +183,12 @@ compareCustom fp a b =
         , \_ -> comparePrecision fp a.m22 b.m22
         ]
         ()
+
+
+mat2Fuzzer : Fuzz.Fuzzer Mat2
+mat2Fuzzer =
+    Fuzz.constant Mat2
+        |> Fuzz.andMap Fuzz.float
+        |> Fuzz.andMap Fuzz.float
+        |> Fuzz.andMap Fuzz.float
+        |> Fuzz.andMap Fuzz.float
