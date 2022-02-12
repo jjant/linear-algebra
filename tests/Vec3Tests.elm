@@ -1,4 +1,4 @@
-module Vec3Tests exposing (suite, vec3Fuzzer)
+module Vec3Tests exposing (nonZeroFuzzer, suite, vec3Fuzzer)
 
 import Expect exposing (Expectation)
 import Fuzz
@@ -71,6 +71,14 @@ vec3Fuzzer =
         Fuzz.float
         Fuzz.float
         Fuzz.float
+
+
+nonZeroFuzzer : Fuzz.Fuzzer Vec3
+nonZeroFuzzer =
+    Fuzz.map3 (\x y z -> { x = x, y = y, z = z })
+        (Fuzz.oneOf [ Fuzz.floatRange -100000 -0.000001, Fuzz.floatRange 0.000001 100000 ])
+        (Fuzz.oneOf [ Fuzz.floatRange -100000 -0.000001, Fuzz.floatRange 0.000001 100000 ])
+        (Fuzz.oneOf [ Fuzz.floatRange -100000 -0.000001, Fuzz.floatRange 0.000001 100000 ])
 
 
 fuzzWrap : String -> (Math.Vec3 -> Float) -> (Vec3.Vec3 -> Float) -> Test
