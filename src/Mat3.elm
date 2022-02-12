@@ -1,7 +1,7 @@
 module Mat3 exposing
     ( Mat3
     , identity, fromRows
-    , mul, invert, transpose
+    , add, mul, invert, transpose
     , rotate, scale, translate
     , lookAt, orthographic, viewport
     , transform, transformVector, transformPoint
@@ -19,7 +19,7 @@ module Mat3 exposing
 
 # Operations
 
-@docs mul, invert, transpose
+@docs add, mul, invert, transpose
 
 
 # 2D Transformations
@@ -84,6 +84,21 @@ fromRows row1 row2 row3 =
     , m31 = row3.x
     , m32 = row3.y
     , m33 = row3.z
+    }
+
+
+{-| -}
+add : Mat3 -> Mat3 -> Mat3
+add a b =
+    { m11 = a.m11 + b.m11
+    , m21 = a.m21 + b.m21
+    , m31 = a.m31 + b.m31
+    , m12 = a.m12 + b.m12
+    , m22 = a.m22 + b.m22
+    , m32 = a.m32 + b.m32
+    , m13 = a.m13 + b.m13
+    , m23 = a.m23 + b.m23
+    , m33 = a.m33 + b.m33
     }
 
 

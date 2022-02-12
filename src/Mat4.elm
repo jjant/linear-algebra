@@ -1,7 +1,7 @@
 module Mat4 exposing
     ( Mat4
     , identity, fromRows
-    , invert, mul, transpose
+    , add, mul, invert, transpose
     , rotate, scale, translate
     , lookAt, orthographic, perspective
     , transformPoint, transformVector, transform
@@ -19,7 +19,7 @@ module Mat4 exposing
 
 # Operations
 
-@docs invert, mul, transpose
+@docs add, mul, invert, transpose
 
 
 # 3D Transformations
@@ -170,6 +170,28 @@ invert m =
             , m34 = r34 * idet
             , m44 = r44 * idet
             }
+
+
+{-| -}
+add : Mat4 -> Mat4 -> Mat4
+add a b =
+    { m11 = a.m11 + b.m11
+    , m21 = a.m21 + b.m21
+    , m31 = a.m31 + b.m31
+    , m41 = a.m41 + b.m41
+    , m12 = a.m12 + b.m12
+    , m22 = a.m22 + b.m22
+    , m32 = a.m32 + b.m32
+    , m42 = a.m42 + b.m42
+    , m13 = a.m13 + b.m13
+    , m23 = a.m23 + b.m23
+    , m33 = a.m33 + b.m33
+    , m43 = a.m43 + b.m43
+    , m14 = a.m14 + b.m14
+    , m24 = a.m24 + b.m24
+    , m34 = a.m34 + b.m34
+    , m44 = a.m44 + b.m44
+    }
 
 
 {-| -}
