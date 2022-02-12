@@ -1,8 +1,9 @@
 module Mat3 exposing
     ( Mat3
     , identity, fromRows, rotate, scale, translate
-    , transpose
+    , transpose, mul
     , transform, transformVector, transformPoint
+    , orthographic
     )
 
 {-| Mat3
@@ -17,7 +18,7 @@ module Mat3 exposing
 
 # Operations
 
-@docs transpose
+@docs transpose, mul
 
 {mul, det,invert}
 
@@ -25,6 +26,11 @@ module Mat3 exposing
 # Transformations
 
 @docs transform, transformVector, transformPoint
+
+
+# Projections
+
+@docs orthographic
 
 -}
 
@@ -73,6 +79,21 @@ fromRows row1 row2 row3 =
     , m31 = row3.x
     , m32 = row3.y
     , m33 = row3.z
+    }
+
+
+{-| -}
+mul : Mat3 -> Mat3 -> Mat3
+mul a b =
+    { m11 = a.m11 * b.m11 + a.m12 * b.m21 + a.m13 * b.m31
+    , m21 = a.m21 * b.m11 + a.m22 * b.m21 + a.m23 * b.m31
+    , m31 = a.m31 * b.m11 + a.m32 * b.m21 + a.m33 * b.m31
+    , m12 = a.m11 * b.m12 + a.m12 * b.m22 + a.m13 * b.m32
+    , m22 = a.m21 * b.m12 + a.m22 * b.m22 + a.m23 * b.m32
+    , m32 = a.m31 * b.m12 + a.m32 * b.m22 + a.m33 * b.m32
+    , m13 = a.m11 * b.m13 + a.m12 * b.m23 + a.m13 * b.m33
+    , m23 = a.m21 * b.m13 + a.m22 * b.m23 + a.m23 * b.m33
+    , m33 = a.m31 * b.m13 + a.m32 * b.m23 + a.m33 * b.m33
     }
 
 
@@ -171,6 +192,15 @@ transform { m11, m12, m13, m21, m22, m23, m31, m32, m33 } { x, y, z } =
         (m11 * x + m12 * y + m13 * z)
         (m21 * x + m22 * y + m23 * z)
         (m31 * x + m32 * y + m33 * z)
+
+
+{-| -}
+orthographic : { width : Float, height : Float } -> Mat3
+orthographic { width, height } =
+    fromRows
+        (vec3 (2 / width) 0 0)
+        (vec3 0 (2 / height) 0)
+        (vec3 0 0 1)
 
 
 
