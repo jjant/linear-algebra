@@ -32,75 +32,26 @@ suite =
                     (vec4 0 0 0 0)
                     |> Mat4.invert
                     |> Expect.equal Nothing
-
-        -- , fuzz mat4Fuzzer "inverseOrthonormal" <|
-        --     \r ->
-        --         Expect.all
-        --             [ compare (r |> Mat4.inverseOrthonormal |> Mat4.toRecord)
-        --             , compare (r |> Record.fromRecord |> Record.inverseOrthonormal |> Record.toRecord)
-        --             , compare (r |> Tuple.fromRecord |> Tuple.inverseOrthonormal |> Tuple.toRecord)
-        --             ]
-        --             (r |> Math.fromRecord |> Math.inverseOrthonormal |> Math.toRecord)
         , fuzz2 mat4Fuzzer mat4Fuzzer "mul" <|
             \r1 r2 ->
                 compare (Mat4.mul r1 r2)
                     (Math.mul (Math.fromRecord r1) (Math.fromRecord r2) |> Math.toRecord)
-
-        -- , fuzz2 mat4Fuzzer mat4Fuzzer "mulAffine" <|
-        --     \r1 r2 ->
-        --         Expect.all
-        --             [ compare (Mat4.mulAffine (Mat4.fromRecord r1) (Mat4.fromRecord r2) |> Mat4.toRecord)
-        --             , compare (Record.mulAffine (Record.fromRecord r1) (Record.fromRecord r2) |> Record.toRecord)
-        --             , compare (Tuple.mulAffine (Tuple.fromRecord r1) (Tuple.fromRecord r2) |> Tuple.toRecord)
-        --             ]
-        --             (Math.mulAffine (Math.fromRecord r1) (Math.fromRecord r2) |> Math.toRecord)
         , fuzz mat4Fuzzer "transpose" <|
             \r ->
                 compare (r |> Mat4.transpose)
                     (r |> Math.fromRecord |> Math.transpose |> Math.toRecord)
-
-        -- , fuzz3 vec3Fuzzer vec3Fuzzer vec3Fuzzer "makeBasis" <|
-        --     \v1 v2 v3 ->
-        --         Expect.all
-        --             [ compare (Mat4.makeBasis v1.adt v2.adt v3.adt |> Mat4.toRecord)
-        --             , compare (Record.makeBasis v1.mat4Fuzzer v2.mat4Fuzzer v3.mat4Fuzzer |> Record.toRecord)
-        --             , compare (Tuple.makeBasis v1.tuple v2.tuple v3.tuple |> Tuple.toRecord)
-        --             ]
-        --             (Math.makeBasis v1.math v2.math v3.math |> Math.toRecord)
         , fuzz2 mat4Fuzzer vec3Fuzzer "transform" <|
             \r1 v2 ->
                 compareVec3 (Mat4.transformPoint r1 v2)
                     (Math.transform (Math.fromRecord r1) (MathVec3.fromRecord v2) |> MathVec3.toRecord)
-
-        -- , fuzz6 Fuzz.float positive Fuzz.float positive Fuzz.float positive "makeFrustum" <|
-        --     \f1 f2 f3 f4 f5 f6 ->
-        --         Expect.all
-        --             [ compare (Mat4.makeFrustum f1 f2 f3 f4 f5 f6 |> Mat4.toRecord)
-        --             , compare (Record.makeFrustum f1 f2 f3 f4 f5 f6 |> Record.toRecord)
-        --             , compare (Tuple.makeFrustum f1 f2 f3 f4 f5 f6 |> Tuple.toRecord)
-        --             ]
-        --             (Math.makeFrustum f1 f2 f3 f4 f5 f6 |> Math.toRecord)
         , fuzz4 positive positive positive positive "makePerspective" <|
             \f1 f2 f3 f4 ->
                 compare (Mat4.perspective { fovy = f1, aspect = f2, zNear = f3, zFar = f4 })
                     (Math.makePerspective f1 f2 f3 f4 |> Math.toRecord)
-
-        -- , fuzz6 Fuzz.float positive Fuzz.float positive Fuzz.float positive "makeOrtho" <|
-        --     \f1 f2 f3 f4 f5 f6 ->
-        --         Expect.all
-        --             [ compare (Mat4.makeOrtho f1 f2 f3 f4 f5 f6 |> Mat4.toRecord)
-        --             , compare (Record.makeOrtho f1 f2 f3 f4 f5 f6 |> Record.toRecord)
-        --             , compare (Tuple.makeOrtho f1 f2 f3 f4 f5 f6 |> Tuple.toRecord)
-        --             ]
-        --             (Math.makeOrtho f1 f2 f3 f4 f5 f6 |> Math.toRecord)
-        -- , fuzz4 Fuzz.float positive Fuzz.float positive "makeOrtho2D" <|
-        --     \f1 f2 f3 f4 ->
-        --         Expect.all
-        --             [ compare (Mat4.makeOrtho2D f1 f2 f3 f4 |> Mat4.toRecord)
-        --             , compare (Record.makeOrtho2D f1 f2 f3 f4 |> Record.toRecord)
-        --             , compare (Tuple.makeOrtho2D f1 f2 f3 f4 |> Tuple.toRecord)
-        --             ]
-        --             (Math.makeOrtho2D f1 f2 f3 f4 |> Math.toRecord)
+        , fuzz6 Fuzz.float positive Fuzz.float positive Fuzz.float positive "makeOrtho" <|
+            \f1 f2 f3 f4 f5 f6 ->
+                compare (Mat4.orthographic { left = f1, right = f2, bottom = f3, top = f4, zNear = f5, zFar = f6 })
+                    (Math.makeOrtho f1 f2 f3 f4 f5 f6 |> Math.toRecord)
         , test "lookAt when eye equals centerOfAttention" <|
             \_ ->
                 let
@@ -142,17 +93,8 @@ suite =
         --             , compare (Tuple.translate v.tuple (Tuple.fromRecord r) |> Tuple.toRecord)
         --             ]
         --             (Math.translate v.math (Math.fromRecord r) |> Math.toRecord)
-        -- , fuzz4 Fuzz.float Fuzz.float Fuzz.float mat4Fuzzer "translate3" <|
-        --     \f1 f2 f3 r ->
-        --         Expect.all
-        --             [ compare (Mat4.translate3 f1 f2 f3 (Mat4.fromRecord r) |> Mat4.toRecord)
-        --             , compare (Record.translate3 f1 f2 f3 (Record.fromRecord r) |> Record.toRecord)
-        --             , compare (Tuple.translate3 f1 f2 f3 (Tuple.fromRecord r) |> Tuple.toRecord)
-        --             ]
-        --             (Math.translate3 f1 f2 f3 (Math.fromRecord r) |> Math.toRecord)
-        , fuzz2 Fuzz.float vec3Fuzzer "makeRotate" <|
-            \f v ->
-                compare (Mat4.rotate f v) (Math.makeRotate f (MathVec3.fromRecord v) |> Math.toRecord)
+        , fuzz2 Fuzz.float Vec3Tests.nonZeroFuzzer "makeRotate" <|
+            \f v -> compare (Mat4.rotate f v) (Math.makeRotate f (MathVec3.fromRecord v) |> Math.toRecord)
         , fuzz vec3Fuzzer "makeScale" <|
             \v ->
                 compare (Mat4.scale v)
@@ -160,6 +102,76 @@ suite =
         , fuzz vec3Fuzzer "makeTranslate" <|
             \v ->
                 compare (Mat4.translate v) (Math.makeTranslate (MathVec3.fromRecord v) |> Math.toRecord)
+        , addTests
+        , transformVectorTests
+        ]
+
+
+addTests : Test
+addTests =
+    describe "Mat4.add"
+        [ fuzz mat4Fuzzer "0 + m == m" <|
+            \m ->
+                let
+                    zero =
+                        Mat4.fromRows
+                            (vec4 0 0 0 0)
+                            (vec4 0 0 0 0)
+                            (vec4 0 0 0 0)
+                            (vec4 0 0 0 0)
+                in
+                Mat4.add m zero
+                    |> Expect.equal m
+        , test "adding known matrices" <|
+            \_ ->
+                Mat4.add
+                    (Mat4.fromRows (vec4 1 2 3 2)
+                        (vec4 3 4 5 0)
+                        (vec4 -1 -2 -3 1)
+                        (vec4 1 1 1 1)
+                    )
+                    (Mat4.fromRows (vec4 5 -1 -10 1)
+                        (vec4 28 0.1 0 1)
+                        (vec4 0 0 0 1)
+                        (vec4 -1 1 -1 1)
+                    )
+                    |> compare
+                        (Mat4.fromRows
+                            (vec4 6 1 -7 3)
+                            (vec4 31 4.1 5 1)
+                            (vec4 -1 -2 -3 2)
+                            (vec4 0 2 0 2)
+                        )
+        ]
+
+
+transformVectorTests : Test
+transformVectorTests =
+    Test.describe "Mat4.transformVector"
+        [ test "Translate" <|
+            \_ ->
+                Mat4.transformVector (Mat4.translate (vec3 1 1 1)) (vec3 0 0 0)
+                    |> Expect.equal (vec3 0 0 0)
+        , test "Translate2" <|
+            \_ ->
+                Mat4.transformVector (Mat4.translate (vec3 1 5 3)) (vec3 2 6 2)
+                    |> Expect.equal (vec3 2 6 2)
+        , test "Scale" <|
+            \_ ->
+                Mat4.transformVector (Mat4.scale (vec3 1 5 0)) (vec3 2 6 19)
+                    |> Expect.equal (vec3 2 30 0)
+        , test "Scale 2" <|
+            \_ ->
+                Mat4.transformVector (Mat4.scale (vec3 0 0 0)) (vec3 2 6 2)
+                    |> Expect.equal (vec3 0 0 0)
+        , test "Translation doesn't affect point" <|
+            \_ ->
+                let
+                    mat =
+                        Mat4.mul (Mat4.translate (vec3 0 5 2)) Mat4.identity
+                in
+                Mat4.transformVector mat (vec3 2 5 1)
+                    |> Expect.equal (vec3 2 5 1)
         ]
 
 
@@ -276,4 +288,4 @@ mat4Fuzzer =
         |> Fuzz.andMap Fuzz.float
         |> Fuzz.andMap Fuzz.float
         |> Fuzz.andMap Fuzz.float
-        |> Fuzz.andMap Fuzz.float
+        |> Fuzz.andMap (Fuzz.oneOf [ Fuzz.floatRange -10000000 -0.0000001, Fuzz.floatRange 0.0000001 10000000 ])
