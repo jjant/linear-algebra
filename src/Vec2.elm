@@ -197,12 +197,16 @@ rotate angleRadians { x, y } =
     vec2 (co * x - si * y) (si * x + co * y)
 
 
-{-| Returns the z-coordinate of the cross product when interpreting the 2d vectors as
-3d vectors of the shape `vec3 v.x v.y 0`.
+{-| Returns the z-coordinate of the cross product when interpreting the 2D vectors as
+3D vectors of the form `vec3 v.x v.y 0`:
 
-    cross v1 v2 == (( v1.x, v1.y, 0 ) x ( v2.x, v2.y, 0 )).z
+    cross v1 v2
+        == (Vec3.cross
+                (vec3 v1.x v1.y 0)
+                (vec3 v2.x v2.y 0)
+           ).z
 
-This operation is usually used to calculate the torque created by a force in 2D.
+This operation is useful for calculating the torque created by a force in 2D, for example.
 
 -}
 cross : Vec2 -> Vec2 -> Float
@@ -304,8 +308,7 @@ left =
     vec2 -1 0
 
 
-{-| Homogeneous coordinates
--}
+{-| -}
 fromHomogeneous : Vec3 -> Vec2
 fromHomogeneous v3 =
     {- TODO: Not sure if this is correct/good/etc. PROBABLY not. -}

@@ -4,7 +4,7 @@ module Mat3 exposing
     , add, mul, invert, transpose
     , rotate, scale, translate
     , lookAt, orthographic, viewport
-    , transform, transformVector, transformPoint
+    , transformPoint, transformVector, transform
     )
 
 {-|
@@ -34,7 +34,7 @@ module Mat3 exposing
 
 # Apply matrices
 
-@docs transform, transformVector, transformPoint
+@docs transformPoint, transformVector, transform
 
 -}
 
@@ -215,14 +215,6 @@ scale vec =
     }
 
 
-{-| Transforms a vector, applying scaling and rotation, but not translation.
--}
-transformVector : Mat3 -> Vec2 -> Vec2
-transformVector mat3 v =
-    transform mat3 (Vec2.vector v)
-        |> Vec2.fromHomogeneous
-
-
 {-| Transforms a point, applying scaling, rotation, and translation.
 -}
 transformPoint : Mat3 -> Vec2 -> Vec2
@@ -231,7 +223,15 @@ transformPoint mat3 p =
         |> Vec2.fromHomogeneous
 
 
-{-| Transforms a 3D vector.
+{-| Transforms a vector, applying scaling and rotation, but not translation.
+-}
+transformVector : Mat3 -> Vec2 -> Vec2
+transformVector mat3 v =
+    transform mat3 (Vec2.vector v)
+        |> Vec2.fromHomogeneous
+
+
+{-| Transforms a general 3D vector.
 -}
 transform : Mat3 -> Vec3 -> Vec3
 transform { m11, m12, m13, m21, m22, m23, m31, m32, m33 } { x, y, z } =
