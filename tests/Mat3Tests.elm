@@ -72,6 +72,184 @@ all =
                                 (vec3 1 4 0)
                             )
             ]
+        , mulTests
+        , invertTests
+        , lookAtTests
+        , viewportTests
+        , transformPointTests
+        , transformVectorTests
+        ]
+
+
+mulTests : Test
+mulTests =
+    describe "Mat3.mul"
+        [ test "Composed with point" <|
+            \_ ->
+                let
+                    mat =
+                        Mat3.mul (Mat3.rotate (Basics.pi / 4)) (Mat3.scale (vec2 2 2))
+                in
+                Mat3.transformPoint mat (vec2 2 6)
+                    |> Expect.equal (Vec2.rotate (pi / 4) (Vec2.scale 2 (vec2 2 6)))
+        , test "Composed with point 2" <|
+            \_ ->
+                let
+                    mat =
+                        Mat3.mul (Mat3.translate (vec2 1 5))
+                            (Mat3.mul (Mat3.rotate (Basics.pi / 4)) (Mat3.scale (vec2 2 2)))
+                in
+                Mat3.transformPoint mat (vec2 2 6)
+                    |> Expect.equal (Vec2.add (vec2 1 5) (Vec2.rotate (pi / 4) (Vec2.scale 2 (vec2 2 6))))
+        , test "Composed with vector" <|
+            \_ ->
+                let
+                    mat =
+                        Mat3.mul (Mat3.rotate (Basics.pi / 4)) (Mat3.scale (vec2 2 2))
+                in
+                Mat3.transformVector mat (vec2 2 6)
+                    |> Expect.equal (Vec2.rotate (pi / 4) (Vec2.scale 2 (vec2 2 6)))
+        , test "Composed with vector 2" <|
+            \_ ->
+                let
+                    mat =
+                        Mat3.mul (Mat3.rotate (Basics.pi / 4)) (Mat3.scale (vec2 2 2))
+                in
+                Mat3.transformVector mat (vec2 2 6)
+                    |> Expect.equal (Vec2.rotate (pi / 4) (Vec2.scale 2 (vec2 2 6)))
+        ]
+
+
+invertTests : Test
+invertTests =
+    describe "Mat3.invert"
+        [ test "identity" <|
+            \_ ->
+                Mat3.identity
+                    |> Mat3.invert
+                    |> Expect.equal (Just Mat3.identity)
+        , test "translate" <|
+            \_ ->
+                Mat3.translate (vec2 1 0)
+                    |> Mat3.invert
+                    |> Maybe.map (\invM -> Mat3.transformPoint invM (vec2 2 25))
+                    |> Expect.equal (Just (vec2 1 25))
+        ]
+
+
+lookAtTests : Test
+lookAtTests =
+    describe "Mat3.lookAt"
+        [ test "centerOfAttention becomes origin" <|
+            \_ ->
+                Mat3.transformPoint
+                    (Mat3.lookAt
+                        { centerOfAttention = vec2 5 5, upDirection = vec2 1 0 }
+                    )
+                    (vec2 5 5)
+                    |> Expect.equal (vec2 0 0)
+        , test "Transforms a known point" <|
+            \_ ->
+                Mat3.transformPoint
+                    (Mat3.lookAt
+                        { centerOfAttention = vec2 5 5, upDirection = vec2 1 0 }
+                    )
+                    (vec2 6 5)
+                    |> Expect.equal (vec2 0 1)
+        , test "Transforms a known point2" <|
+            \_ ->
+                Mat3.transformPoint
+                    (Mat3.lookAt
+                        { centerOfAttention = vec2 5 5, upDirection = vec2 0 1 }
+                    )
+                    (vec2 6 5)
+                    |> Expect.equal (vec2 1 0)
+        ]
+
+
+viewportTests : Test
+viewportTests =
+    describe "Mat3.viewport"
+        [ test "Origin 1080p" <|
+            \_ ->
+                Mat3.transformPoint (Mat3.viewport { width = 1920, height = 1080 }) (vec2 0 0)
+                    |> Expect.equal (vec2 (1920 / 2) (1080 / 2))
+        , test "Upper right corner 1080p" <|
+            \_ ->
+                Mat3.transformPoint (Mat3.viewport { width = 1920, height = 1080 }) (vec2 1 1)
+                    |> Expect.equal (vec2 1920 0)
+        , test "Lower right corner 1080p" <|
+            \_ ->
+                Mat3.transformPoint (Mat3.viewport { width = 1920, height = 1080 }) (vec2 1 -1)
+                    |> Expect.equal (vec2 1920 1080)
+        , test "Upper left corner 1080p" <|
+            \_ ->
+                Mat3.transformPoint (Mat3.viewport { width = 1920, height = 1080 }) (vec2 -1 1)
+                    |> Expect.equal (vec2 0 0)
+        , test "Lower left corner 1080p" <|
+            \_ ->
+                Mat3.transformPoint (Mat3.viewport { width = 1920, height = 1080 }) (vec2 -1 -1)
+                    |> Expect.equal (vec2 0 1080)
+        ]
+
+
+transformPointTests : Test
+transformPointTests =
+    describe "Mat3.transformPoint"
+        [ test "Translate" <|
+            \_ ->
+                Mat3.transformPoint (Mat3.translate (vec2 1 1)) (vec2 0 0)
+                    |> Expect.equal (vec2 1 1)
+        , test "Translate2" <|
+            \_ ->
+                Mat3.transformPoint (Mat3.translate (vec2 1 5)) (vec2 2 6)
+                    |> Expect.equal (vec2 3 11)
+        , test "Scale" <|
+            \_ ->
+                Mat3.transformPoint (Mat3.scale (vec2 1 5)) (vec2 2 6)
+                    |> Expect.equal (vec2 2 30)
+        , test "Scale 2" <|
+            \_ ->
+                Mat3.transformPoint (Mat3.scale (vec2 0 0)) (vec2 2 6)
+                    |> Expect.equal (vec2 0 0)
+        , test "Rotate" <|
+            \_ ->
+                Mat3.transformPoint (Mat3.rotate (Basics.pi / 2)) (vec2 2 6)
+                    |> Expect.equal (Vec2.rotate (pi / 2) (vec2 2 6))
+        ]
+
+
+transformVectorTests : Test
+transformVectorTests =
+    Test.describe "Mat3.transformVector"
+        [ test "Translate" <|
+            \_ ->
+                Mat3.transformVector (Mat3.translate (vec2 1 1)) (vec2 0 0)
+                    |> Expect.equal (vec2 0 0)
+        , test "Translate2" <|
+            \_ ->
+                Mat3.transformVector (Mat3.translate (vec2 1 5)) (vec2 2 6)
+                    |> Expect.equal (vec2 2 6)
+        , test "Scale" <|
+            \_ ->
+                Mat3.transformVector (Mat3.scale (vec2 1 5)) (vec2 2 6)
+                    |> Expect.equal (vec2 2 30)
+        , test "Scale 2" <|
+            \_ ->
+                Mat3.transformVector (Mat3.scale (vec2 0 0)) (vec2 2 6)
+                    |> Expect.equal (vec2 0 0)
+        , test "Rotate" <|
+            \_ ->
+                Mat3.transformVector (Mat3.rotate (Basics.pi / 2)) (vec2 2 6)
+                    |> Expect.equal (Vec2.rotate (pi / 2) (vec2 2 6))
+        , test "Translation doesn't affect point" <|
+            \_ ->
+                let
+                    mat =
+                        Mat3.mul (Mat3.translate (vec2 0 5)) Mat3.identity
+                in
+                Mat3.transformVector mat (vec2 2 5)
+                    |> Expect.equal (vec2 2 5)
         ]
 
 

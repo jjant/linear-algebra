@@ -1,12 +1,12 @@
 module Mat3 exposing
     ( Mat3
     , identity, fromRows, rotate, scale, translate
-    , transpose, mul
+    , mul, invert, transpose
     , transform, transformVector, transformPoint
     , lookAt, orthographic, viewport
     )
 
-{-| Mat3
+{-|
 
 @docs Mat3
 
@@ -18,12 +18,10 @@ module Mat3 exposing
 
 # Operations
 
-@docs transpose, mul
-
-{mul, det,invert}
+@docs mul, invert, transpose
 
 
-# Transformations
+# Apply matrices
 
 @docs transform, transformVector, transformPoint
 
@@ -95,6 +93,33 @@ mul a b =
     , m23 = a.m21 * b.m13 + a.m22 * b.m23 + a.m23 * b.m33
     , m33 = a.m31 * b.m13 + a.m32 * b.m23 + a.m33 * b.m33
     }
+
+
+{-| -}
+invert : Mat3 -> Maybe Mat3
+invert { m11, m12, m13, m21, m22, m23, m31, m32, m33 } =
+    let
+        det =
+            m11 * m22 * m33 + m12 * m23 * m31 + m13 * m21 * m32 - m11 * m23 * m32 - m12 * m21 * m33 - m13 * m22 * m31
+
+        idet =
+            1 / det
+    in
+    if det == 0 then
+        Nothing
+
+    else
+        Just
+            { m11 = (m22 * m33 - m23 * m32) * idet
+            , m12 = (m13 * m32 - m12 * m33) * idet
+            , m13 = (m12 * m23 - m13 * m22) * idet
+            , m21 = (m23 * m31 - m21 * m33) * idet
+            , m22 = (m11 * m33 - m13 * m31) * idet
+            , m23 = (m13 * m21 - m11 * m23) * idet
+            , m31 = (m21 * m32 - m22 * m31) * idet
+            , m32 = (m12 * m31 - m11 * m32) * idet
+            , m33 = (m11 * m22 - m12 * m21) * idet
+            }
 
 
 {-| -}
@@ -171,16 +196,16 @@ scale vec =
 {-| Transforms a vector, applying scaling and rotation, but not translation.
 -}
 transformVector : Mat3 -> Vec2 -> Vec2
-transformVector mat3 v2 =
-    transform mat3 (vec3 v2.x v2.y 0)
-        |> drop3rdCoordinate
+transformVector mat3 v =
+    transform mat3 (Vec2.vector v)
+        |> Vec2.fromHomogeneous
 
 
 {-| Transforms a point, applying scaling, rotation, and translation.
 -}
 transformPoint : Mat3 -> Vec2 -> Vec2
-transformPoint mat3 v2 =
-    transform mat3 (vec3 v2.x v2.y 1)
+transformPoint mat3 p =
+    transform mat3 (Vec2.point p)
         |> Vec2.fromHomogeneous
 
 
@@ -262,12 +287,3 @@ viewport { width, height } =
         |> mul (scale (vec2 width height))
         -- [0, width] x [height, 0]
         |> mul (translate (vec2 0 height))
-
-
-
----- MISC ----
-
-
-drop3rdCoordinate : Vec3 -> Vec2
-drop3rdCoordinate v3 =
-    vec2 v3.x v3.y

@@ -5,7 +5,7 @@ module Mat2 exposing
     , transform
     )
 
-{-| Mat2
+{-|
 
 @docs Mat2
 
@@ -20,7 +20,7 @@ module Mat2 exposing
 @docs mul, invert, transpose, det, add
 
 
-# Transformations
+# Apply matrices
 
 @docs transform
 

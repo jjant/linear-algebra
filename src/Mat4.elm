@@ -36,8 +36,7 @@ import Vec3 exposing (Vec3)
 import Vec4 exposing (Vec4, vec4)
 
 
-{-| Mat4
--}
+{-| -}
 type alias Mat4 =
     { m11 : Float
     , m12 : Float
