@@ -3,7 +3,7 @@ module Mat3 exposing
     , identity, fromRows, rotate, scale, translate
     , transpose, mul
     , transform, transformVector, transformPoint
-    , orthographic
+    , lookAt, orthographic
     )
 
 {-| Mat3
@@ -30,7 +30,7 @@ module Mat3 exposing
 
 # Projections
 
-@docs orthographic
+@docs lookAt, orthographic
 
 -}
 
@@ -192,6 +192,19 @@ transform { m11, m12, m13, m21, m22, m23, m31, m32, m33 } { x, y, z } =
         (m11 * x + m12 * y + m13 * z)
         (m21 * x + m22 * y + m23 * z)
         (m31 * x + m32 * y + m33 * z)
+
+
+{-| -}
+lookAt : { centerOfAttention : Vec2, upDirection : Vec2 } -> Mat3
+lookAt { centerOfAttention, upDirection } =
+    let
+        angle =
+            Vec2.angle upDirection - Vec2.angle Vec2.up
+    in
+    -- Center of attention becomes 0,0
+    translate (Vec2.negate centerOfAttention)
+        -- Rotate stuff so that up direction is up
+        |> mul (rotate -angle)
 
 
 {-| -}
